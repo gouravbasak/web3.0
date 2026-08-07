@@ -94,7 +94,24 @@ router.put("/:id", adminAuth, async (req, res) => {
   }
 });
 
+// TOGGLE FEATURED / AD STATUS (ADMIN)
+router.patch("/:id/toggle-featured", adminAuth, async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    product.isFeatured = !product.isFeatured;
+    await product.save();
+
+    res.json({ ok: true, isFeatured: product.isFeatured, product });
+  } catch (err) {
+    console.error("ADMIN TOGGLE FEATURED ERROR:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // DELETE PRODUCT (ADMIN)
+
 router.delete("/:id", adminAuth, async (req, res) => {
   try {
     const deleted = await Product.findByIdAndDelete(req.params.id);

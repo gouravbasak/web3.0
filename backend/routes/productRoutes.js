@@ -10,7 +10,11 @@ router.get("/", async (req, res) => {
     let filter = { status: "available" };
     let sortOption = { createdAt: -1 }; // default
 
-    // 🔍 SEARCH (add search conditions to existing filter)
+    // 🔍 SEARCH & FILTERS (add search conditions to existing filter)
+    if (req.query.isFeatured === "true") {
+      filter.isFeatured = true;
+    }
+
     if (search && search.trim()) {
       const q = search.trim();
       filter = {
@@ -23,6 +27,7 @@ router.get("/", async (req, res) => {
         ],
       };
     }
+
 
     // ↕️ PRICE SORT
     if (sort === "price_asc") {
@@ -67,7 +72,25 @@ router.get("/recent", async (req, res) => {
   }
 });
 
+// ✅ GET FEATURED AD PRODUCTS (only available ones)
+router.get("/featured", async (req, res) => {
+  try {
+    const products = await Product.find({ 
+      status: "available",
+      isFeatured: true 
+    })
+      .sort({ updatedAt: -1 })
+      .lean();
+
+    res.json(products);
+  } catch (err) {
+    console.error("FEATURED PRODUCTS ERROR:", err);
+    res.status(500).json({ message: "Failed to fetch featured ad products" });
+  }
+});
+
 // ✅ GET BEST SELLERS (only available products)
+
 router.get("/best-sellers", async (req, res) => {
   try {
     const products = await Product.find({ 

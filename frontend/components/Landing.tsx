@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+
 import Link from "next/link";
 import {
   Sparkles,
@@ -16,9 +18,94 @@ import {
   Award,
   ChevronRight
 } from "lucide-react";
+import { getApiBaseUrl } from "@/lib/apiBase";
+
+const API = getApiBaseUrl();
+
+type AdProduct = {
+  _id: string;
+  title: string;
+  description: string;
+  price: number;
+  mrp?: number;
+  brand: string;
+  category: string;
+  images?: string[];
+  averageRating?: number;
+  reviewCount?: number;
+};
 
 export default function UniversalLanding() {
+  const [ads, setAds] = useState<AdProduct[]>([]);
+  const [activeAdIndex, setActiveAdIndex] = useState(0);
+  const [loadingAds, setLoadingAds] = useState(true);
+  const [hasAdminSelectedAds, setHasAdminSelectedAds] = useState(false);
+
+  useEffect(() => {
+    async function fetchAds() {
+      try {
+        // 1. Check for admin-selected ad products (isFeatured: true)
+        let res = await fetch(`${API}/api/products/featured`, { cache: "no-store" });
+        
+        if (!res.ok) {
+          res = await fetch(`${API}/api/products?isFeatured=true`, { cache: "no-store" });
+        }
+
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            const featuredList = data.filter((p: any) => p.isFeatured);
+            if (featuredList.length > 0) {
+              setAds(featuredList);
+              setHasAdminSelectedAds(true);
+              return;
+            }
+          }
+        }
+
+        // 2. FALLBACK: If NO products are selected as Ads by admin, show ONLY the Top Selling Product
+        setHasAdminSelectedAds(false);
+        const topSellingRes = await fetch(`${API}/api/products/best-sellers`, { cache: "no-store" });
+        if (topSellingRes.ok) {
+          const bestSellers = await topSellingRes.json();
+          if (Array.isArray(bestSellers) && bestSellers.length > 0) {
+            setAds([bestSellers[0]]);
+            return;
+          }
+        }
+
+        // 3. Ultimate Fallback: Single most recent product
+        const fallbackRes = await fetch(`${API}/api/products`, { cache: "no-store" });
+        if (fallbackRes.ok) {
+          const fallbackData = await fallbackRes.json();
+          if (Array.isArray(fallbackData) && fallbackData.length > 0) {
+            setAds([fallbackData[0]]);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load ad products:", err);
+      } finally {
+        setLoadingAds(false);
+      }
+    }
+    fetchAds();
+  }, []);
+
+
+
+  // 🔁 1-BY-1 AUTO SLIDESHOW FOR ADS
+  useEffect(() => {
+    if (ads.length <= 1) return;
+
+    const timer = setInterval(() => {
+      setActiveAdIndex((prev) => (prev + 1) % ads.length);
+    }, 4500);
+
+    return () => clearInterval(timer);
+  }, [ads.length]);
+
   return (
+
     <>
       {/* ================= NIKE / APPLE STYLED UNIVERSAL HERO SHOWCASE ================= */}
       <section className="relative w-full min-h-[88vh] bg-slate-50 dark:bg-[#060814] text-slate-900 dark:text-white overflow-hidden flex items-center pt-8 pb-16 px-4 sm:px-6 lg:px-12 border-b border-slate-200/80 dark:border-emerald-950/40 transition-colors duration-300">
@@ -91,7 +178,7 @@ export default function UniversalLanding() {
 
             </div>
 
-            {/* HERO RIGHT SHOWCASE: NIKE / APPLE HIGH-END EDITORIAL BANNER */}
+            {/* HERO RIGHT SHOWCASE: DYNAMIC 1-BY-1 ADMIN AD CAROUSEL */}
             <div className="lg:col-span-5 flex justify-center">
               <div className="w-full max-w-md relative group">
                 
@@ -99,59 +186,111 @@ export default function UniversalLanding() {
                 <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-3xl blur-2xl opacity-25 group-hover:opacity-40 transition duration-500" />
 
                 {/* Main Editorial Card Container */}
-                <div className="relative bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800/80 rounded-3xl p-6 shadow-xl dark:shadow-2xl overflow-hidden transition-all duration-300">
+                <div className="relative bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800/80 rounded-3xl p-6 shadow-xl dark:shadow-2xl overflow-hidden transition-all duration-300 min-h-[440px]">
                   
-                  {/* Top Badge */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                      ★ Featured Store Flagship
-                    </span>
-                    <span className="flex items-center gap-1 text-xs font-bold text-amber-500">
-                      <Star className="h-3.5 w-3.5 fill-amber-400" /> 4.9 (120+ Reviews)
-                    </span>
-                  </div>
-
-                  {/* Image Container with Feather Blur */}
-                  <div className="w-full h-64 rounded-2xl overflow-hidden mb-5 relative bg-slate-100 dark:bg-zinc-950 flex items-center justify-center">
-                    <img
-                      src="https://firebasestorage.googleapis.com/v0/b/sports-store-c7541.firebasestorage.app/o/products%2F1770714515367-Gemini_Generated_Image_5s12eq5s12eq5s12.png?alt=media&token=5e248a57-294b-482e-b462-9c9e3bb5491c"
-                      alt="Solid-state Power Bank"
-                      className="w-full h-full object-contain p-2 transform group-hover:scale-105 transition-transform duration-700 ease-out"
-                    />
-                  </div>
-
-                  {/* Editorial Copy */}
-                  <div className="space-y-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block">
-                      IONYX Engineering • Tech Edition
-                    </span>
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white leading-tight">
-                      Solid-State Magsafe Power Bank
-                    </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                      20W PD Fast Charge with Qi2 wireless MagSafe charging for iPhone, Watch & AirPods with built-in kickstand.
-                    </p>
-                  </div>
-
-                  {/* Bottom Price & Call To Action */}
-                  <div className="mt-5 pt-4 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between">
-                    <div>
-                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Special Offer</span>
-                      <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">₹1,700</span>
+                  {loadingAds ? (
+                    <div className="h-[400px] flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500" />
                     </div>
+                  ) : ads.length > 0 ? (
+                    (() => {
+                      const currentAd = ads[activeAdIndex];
+                      const discount = currentAd.mrp && currentAd.mrp > currentAd.price
+                        ? Math.round(((currentAd.mrp - currentAd.price) / currentAd.mrp) * 100)
+                        : 0;
 
-                    <Link
-                      href="/products/6989ef5f87f827f666276541"
-                      className="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-md"
-                    >
-                      Shop Flagship <ChevronRight className="h-4 w-4" />
-                    </Link>
-                  </div>
+                      return (
+                        <div key={currentAd._id} className="animate-in fade-in duration-500 flex flex-col justify-between h-full">
+                          {/* Top Badge & Slide Indicator */}
+                          <div className="flex items-center justify-between mb-4">
+                            <span className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5">
+                              <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                              </span>
+                              {hasAdminSelectedAds 
+                                ? `★ Featured Ad ${ads.length > 1 ? `(${activeAdIndex + 1}/${ads.length})` : ""}`
+                                : "★ Top Selling Product"}
+                            </span>
+
+                            <span className="flex items-center gap-1 text-xs font-bold text-amber-500">
+                              <Star className="h-3.5 w-3.5 fill-amber-400" /> {currentAd.averageRating || "4.9"} ({currentAd.reviewCount || 12}+ Reviews)
+                            </span>
+                          </div>
+
+                          {/* Image Container with Fixed Bounds */}
+                          <div className="w-full h-60 rounded-2xl overflow-hidden mb-4 relative bg-slate-100 dark:bg-zinc-950 flex items-center justify-center p-4">
+                            <img
+                              src={currentAd.images?.[0] || "/placeholder.png"}
+                              alt={currentAd.title}
+                              className="w-full h-full object-contain p-2 transform group-hover:scale-105 transition-transform duration-700 ease-out"
+                            />
+                            {discount > 0 && (
+                              <span className="absolute top-3 left-3 bg-red-600 text-white font-black text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md">
+                                {discount}% OFF
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Editorial Copy */}
+                          <div className="space-y-1.5">
+                            <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block">
+                              {currentAd.brand || "IONYX Select"} • {currentAd.category}
+                            </span>
+                            <h3 className="text-xl font-black text-slate-900 dark:text-white leading-tight truncate">
+                              {currentAd.title}
+                            </h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed h-8">
+                              {currentAd.description}
+                            </p>
+                          </div>
+
+                          {/* Bottom Price & Call To Action */}
+                          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between">
+                            <div>
+                              <span className="text-[10px] uppercase font-bold text-slate-400 block">Special Offer</span>
+                              <div className="flex items-baseline gap-2">
+                                <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">₹{currentAd.price.toLocaleString()}</span>
+                                {currentAd.mrp && currentAd.mrp > currentAd.price && (
+                                  <span className="text-xs text-slate-400 line-through">₹{currentAd.mrp.toLocaleString()}</span>
+                                )}
+                              </div>
+                            </div>
+
+                            <Link
+                              href={`/products/${currentAd._id}`}
+                              className="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-md hover:scale-105"
+                            >
+                              Shop Now <ChevronRight className="h-4 w-4" />
+                            </Link>
+                          </div>
+
+                          {/* CAROUSEL PROGRESS DOTS */}
+                          {ads.length > 1 && (
+                            <div className="flex items-center justify-center gap-2 mt-3 pt-1">
+                              {ads.map((_, i) => (
+                                <button
+                                  key={i}
+                                  onClick={() => setActiveAdIndex(i)}
+                                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                                    i === activeAdIndex ? "w-6 bg-emerald-500" : "w-1.5 bg-slate-300 dark:bg-zinc-700"
+                                  }`}
+                                  aria-label={`Go to slide ${i + 1}`}
+                                />
+                              ))}
+                            </div>
+                          )}
+
+                        </div>
+                      );
+                    })()
+                  ) : null}
 
                 </div>
 
               </div>
             </div>
+
 
           </div>
         </div>

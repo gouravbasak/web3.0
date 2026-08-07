@@ -135,9 +135,15 @@ app.get("/", (req, res) => {
 
 /* ================= DATABASE ================= */
 const connectDB = async () => {
-  const primaryUri = process.env.MONGO_URI;
+  let primaryUri = (process.env.MONGO_URI || "").trim();
+  if (primaryUri.startsWith("MONGO_URI=")) {
+    primaryUri = primaryUri.replace(/^MONGO_URI=\s*/, "").trim();
+  }
+  if (primaryUri.startsWith('"') || primaryUri.startsWith("'")) {
+    primaryUri = primaryUri.replace(/^["']|["']$/g, "").trim();
+  }
 
-  if (primaryUri) {
+  if (primaryUri && (primaryUri.startsWith("mongodb://") || primaryUri.startsWith("mongodb+srv://"))) {
     try {
       console.log("🔄 Connecting to MongoDB Atlas...");
       await mongoose.connect(primaryUri, {
@@ -155,6 +161,7 @@ const connectDB = async () => {
       console.error("❌ MongoDB Atlas Connection Error:", err.message);
     }
   }
+
 
   try {
     console.log("🔄 Retrying with local MongoDB (mongodb://127.0.0.1:27017/webs)...");

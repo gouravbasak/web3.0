@@ -32,6 +32,7 @@ type Product = {
   brand: string;
   images?: string[];
   stock?: number;
+  isFeatured?: boolean;
 };
 import { getApiBaseUrl, getAdminAuthHeaders } from "@/lib/apiBase";
 
@@ -69,6 +70,49 @@ export default function AdminProductsPage() {
       setLoading(false);
     }
   };
+
+  const toggleFeatured = async (id: string) => {
+    const targetProduct = products.find((p) => p._id === id);
+    if (!targetProduct) return;
+
+    const newFeaturedStatus = !targetProduct.isFeatured;
+
+    try {
+      const res = await fetch(`${API}/api/admin/products/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAdminAuthHeaders(),
+        },
+        body: JSON.stringify({ isFeatured: newFeaturedStatus }),
+      });
+
+      if (!res.ok) {
+        toast.error("Failed to update ad status");
+        return;
+      }
+
+      const updated = await res.json();
+      const updatedStatus = updated && typeof updated.isFeatured !== "undefined"
+        ? Boolean(updated.isFeatured)
+        : newFeaturedStatus;
+
+      setProducts((prev) =>
+        prev.map((p) => (p._id === id ? { ...p, isFeatured: updatedStatus } : p))
+      );
+      toast.success(
+        updatedStatus
+          ? "Product added to Landing Page Ads!"
+          : "Product removed from Landing Page Ads!"
+      );
+    } catch (err) {
+      console.error("Toggle featured error:", err);
+      toast.error("Network error");
+    }
+  };
+
+
 
   useEffect(() => {
     loadProducts();
@@ -183,6 +227,7 @@ export default function AdminProductsPage() {
                   </button>
                 </TableHead>
                 <TableHead className="text-center">Stock</TableHead>
+                <TableHead className="text-center">Landing Ad</TableHead>
                 <TableHead className="text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -257,6 +302,21 @@ export default function AdminProductsPage() {
                         "—"
                       )}
                     </TableCell>
+
+                    {/* LANDING AD TOGGLE */}
+                    <TableCell>
+                      <button
+                        onClick={() => toggleFeatured(p._id)}
+                        className={`px-3 py-1 text-xs font-bold rounded-full transition-all duration-200 flex items-center justify-center gap-1 mx-auto ${
+                          p.isFeatured
+                            ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-400 dark:border-emerald-700 hover:scale-105 shadow-sm"
+                            : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border border-gray-300 dark:border-gray-700 hover:border-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-400"
+                        }`}
+                      >
+                        {p.isFeatured ? "★ Active Ad" : "+ Run Ad"}
+                      </button>
+                    </TableCell>
+
 
                     {/* ACTIONS */}
                     <TableCell>

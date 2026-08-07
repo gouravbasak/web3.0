@@ -102,7 +102,9 @@ export default function EditProductPage({ params }: any) {
           category: data.category,
           stock: data.stock,
           status: data.status || "available",
+          isFeatured: Boolean(data.isFeatured),
         });
+
 
         setExistingImages(data.images || []);
         setVariants(data.variants || []);
@@ -257,8 +259,8 @@ export default function EditProductPage({ params }: any) {
                 />
               </Card>
 
-              {/* Status & Brand Row - Compact */}
-              <div className="grid grid-cols-2 gap-4">
+              {/* Status, Brand & Ad Banner Row - Compact */}
+              <div className="grid grid-cols-3 gap-4">
                 <Card className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -275,6 +277,21 @@ export default function EditProductPage({ params }: any) {
                 </Card>
 
                 <Card className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">Landing Ad</p>
+                      <p className="text-xs text-muted-foreground">Feature in Hero banner</p>
+                    </div>
+                    <Switch
+                      checked={form.isFeatured}
+                      onCheckedChange={(checked) =>
+                        setForm({ ...form, isFeatured: checked })
+                      }
+                    />
+                  </div>
+                </Card>
+
+                <Card className="p-4">
                   <label className="text-sm font-medium block mb-1">Brand</label>
                   <Input
                     value={form.brand}
@@ -284,6 +301,7 @@ export default function EditProductPage({ params }: any) {
                   />
                 </Card>
               </div>
+
 
               {/* Category - Compact */}
               <Card className="p-4">

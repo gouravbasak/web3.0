@@ -70,6 +70,12 @@ const productSchema = new mongoose.Schema({
     default: 'available',
   },
 
+  isFeatured: {
+    type: Boolean,
+    default: false,
+  },
+
+
   // ✅ REVIEW FIELDS MUST BE HERE
   reviews: [{
     userId: {
