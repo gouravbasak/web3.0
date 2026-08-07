@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/carousel";
 import { Star, MessageSquare } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { getApiBaseUrl } from "@/lib/apiBase";
 
 type Review = {
   _id: string;
@@ -52,7 +53,7 @@ export default function ProductReviewsCarousel({
     try {
       setLoading(true);
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000"}/api/products/${productId}/reviews`
+        `${getApiBaseUrl()}/api/products/${productId}/reviews`
       );
       
       if (response.ok) {
@@ -68,7 +69,7 @@ export default function ProductReviewsCarousel({
     }
   };
 
-  if (!loading && !hasReviews) {
+  if (!hasReviews) {
     return null;
   }
 
@@ -112,10 +113,8 @@ export default function ProductReviewsCarousel({
       .slice(0, 2);
   };
 
-  if (loading) {
-    return (
-      <div className="py-2 text-xs text-slate-400">Loading reviews...</div>
-    );
+  if (loading || !hasReviews) {
+    return null;
   }
 
   const averageRating = reviews.length > 0
