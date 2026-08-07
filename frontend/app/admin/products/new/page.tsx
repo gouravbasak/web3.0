@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Upload, X, Save, Eye } from "lucide-react";
-import { getApiBaseUrl } from "@/lib/apiBase";
+import { getApiBaseUrl, getAdminAuthHeaders } from "@/lib/apiBase";
 
 const API = getApiBaseUrl();
 
@@ -110,7 +110,7 @@ export default function AdminNewProductPage() {
 
       const res = await fetch(`${API}/api/admin/products`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
         credentials: "include",
         body: JSON.stringify({
           ...form,

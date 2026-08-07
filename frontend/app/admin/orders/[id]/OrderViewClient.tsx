@@ -3,7 +3,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-import { getApiBaseUrl } from "@/lib/apiBase";
+import { getApiBaseUrl, getAdminAuthHeaders } from "@/lib/apiBase";
 
 const API_BASE = getApiBaseUrl();
 
@@ -55,7 +55,7 @@ export default function OrderViewClient({ order }: { order: any }) {
         `${API_BASE}/api/orders/${encodeURIComponent(apiId)}/status`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
           credentials: "include", // required for admin cookie auth
           body: JSON.stringify({ status: finalStatus }),
         },

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import { getApiBaseUrl } from "@/lib/apiBase";
+import { getApiBaseUrl, getAdminAuthHeaders } from "@/lib/apiBase";
 import { useReactToPrint } from "react-to-print";
 import {
   BarChart,
@@ -83,8 +83,12 @@ export default function AdminDashboardClient() {
     setIsRefreshing(true);
     try {
       const [p, o] = await Promise.all([
-        fetch(`${API}/api/products`).then((r) => r.json()),
-        fetch(`${API}/api/orders`).then((r) => r.json()),
+        fetch(`${API}/api/products`, {
+          headers: getAdminAuthHeaders(),
+        }).then((r) => r.json()),
+        fetch(`${API}/api/orders`, {
+          headers: getAdminAuthHeaders(),
+        }).then((r) => r.json()),
       ]);
       setProducts(Array.isArray(p) ? p : []);
       setOrders(Array.isArray(o) ? o : []);

@@ -33,7 +33,7 @@ type Product = {
   images?: string[];
   stock?: number;
 };
-import { getApiBaseUrl } from "@/lib/apiBase";
+import { getApiBaseUrl, getAdminAuthHeaders } from "@/lib/apiBase";
 
 const API = getApiBaseUrl();
 
@@ -50,6 +50,9 @@ export default function AdminProductsPage() {
     try {
       const res = await fetch(`${API}/api/admin/products`, {
         credentials: "include",
+        headers: {
+          ...getAdminAuthHeaders(),
+        },
       });
 
       if (!res.ok) {
@@ -100,6 +103,9 @@ export default function AdminProductsPage() {
       const res = await fetch(`${API}/api/admin/products/${id}`, {
         method: "DELETE",
         credentials: "include",
+        headers: {
+          ...getAdminAuthHeaders(),
+        },
       });
 
       if (!res.ok) {

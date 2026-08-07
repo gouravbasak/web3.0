@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { getApiBaseUrl } from "@/lib/apiBase";
+import { getApiBaseUrl, getAdminAuthHeaders } from "@/lib/apiBase";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
@@ -80,7 +80,7 @@ export default function AdminOrdersPage() {
     try {
       const res = await fetch(
         `${getApiBaseUrl()}/api/orders`,
-        { credentials: "include" },
+        { credentials: "include", headers: getAdminAuthHeaders() },
       );
 
       if (!res.ok) throw new Error("Failed to load");

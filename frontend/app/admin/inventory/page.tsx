@@ -14,7 +14,7 @@ type Product = {
   brand?: string;
   category?: string;
 };
-import { getApiBaseUrl } from "@/lib/apiBase";
+import { getApiBaseUrl, getAdminAuthHeaders } from "@/lib/apiBase";
 
 const BACKEND = getApiBaseUrl();
 
@@ -52,7 +52,7 @@ export default function AdminInventoryPage() {
     try {
       const res = await fetch(`${BACKEND}/api/admin/products/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
         body: JSON.stringify({ $incStock: delta }),
         credentials: "include", // send admin cookie if required
       });

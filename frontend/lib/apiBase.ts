@@ -26,4 +26,9 @@ export function getApiBaseUrl(): string {
   return "http://localhost:4000";
 }
 
+export function getAdminAuthHeaders(): Record<string, string> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("adminToken") || "" : "";
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export const API_BASE = getApiBaseUrl();
