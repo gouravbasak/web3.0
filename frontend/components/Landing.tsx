@@ -128,20 +128,20 @@ export default function UniversalLanding() {
               {/* Category Pill Badge */}
               <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white dark:bg-white/10 border border-slate-200 dark:border-white/20 text-slate-800 dark:text-slate-100 text-xs font-bold uppercase tracking-widest shadow-sm dark:shadow-[0_0_20px_rgba(255,255,255,0.1)]">
                 <Sparkles className="h-4 w-4 text-emerald-600 dark:text-emerald-300" />
-                <span>Fashion • Tech • Sports • Lifestyle</span>
+                <span>Certified Fast Power • Pro Audio • Premium Gear</span>
               </div>
 
               {/* Main Headline */}
               <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
-                Curated Essentials. <br />
+                Certified Fast Power <br />
                 <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-slate-900 dark:from-slate-100 dark:via-slate-200 dark:to-emerald-300 bg-clip-text text-transparent">
-                  Engineered for Life.
+                  & Pro Audio Gear.
                 </span>
               </h1>
 
               {/* Description */}
               <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg max-w-xl leading-relaxed">
-                Discover a flagship multi-category store featuring premium apparel, cutting-edge technology, pro sports equipment, and daily luxury essentials.
+                Upgrade your daily setup with high-speed MagSafe power banks, 240W fast-charging cables, ergonomic gear, and high-fidelity audio equipment.
               </p>
 
               {/* Action Buttons */}
@@ -151,7 +151,7 @@ export default function UniversalLanding() {
                   className="group relative inline-flex items-center justify-center gap-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-950 font-black text-base px-8 py-4 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5"
                 >
                   <ShoppingBag className="h-5 w-5" />
-                  Explore All Products
+                  Explore Catalog
                   <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
 
@@ -159,22 +159,23 @@ export default function UniversalLanding() {
                   href="/products?sort=newest"
                   className="inline-flex items-center justify-center gap-2 bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200 dark:border-white/20 text-slate-800 dark:text-slate-200 font-bold text-base px-6 py-4 rounded-2xl transition"
                 >
-                  <Flame className="h-5 w-5 text-amber-500" /> New Arrivals
+                  <Flame className="h-5 w-5 text-amber-500" /> New Tech Arrivals
                 </Link>
               </div>
 
               {/* Value proposition badges */}
               <div className="pt-4 flex flex-wrap items-center gap-6 text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200/80 dark:border-white/10">
                 <span className="flex items-center gap-1.5 font-semibold">
-                  <Truck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> Free Shipping over ₹1,500
+                  <Truck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> Express 24h Shipping
                 </span>
                 <span className="flex items-center gap-1.5 font-semibold">
-                  <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> 100% Genuine Guarantee
+                  <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> 1-Year Official Warranty
                 </span>
                 <span className="flex items-center gap-1.5 font-semibold">
-                  <RotateCcw className="h-4 w-4 text-amber-500" /> 7-Day Hassle-Free Return
+                  <RotateCcw className="h-4 w-4 text-amber-500" /> 7-Day Easy Exchange
                 </span>
               </div>
+
 
             </div>
 
@@ -430,33 +431,34 @@ export default function UniversalLanding() {
             <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 flex items-center justify-center group-hover:scale-110 transition shadow-sm">
               <Truck className="h-6 w-6" />
             </div>
-            <h3 className="font-bold text-base text-slate-900 dark:text-white">Worldwide Express Shipping</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Fast delivery right to your doorstep</p>
+            <h3 className="font-bold text-base text-slate-900 dark:text-white">24-Hour Express Dispatch</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Shipped within 24h with live SMS tracking</p>
           </div>
 
           <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 backdrop-blur-xl hover:border-emerald-400/40 transition duration-300 space-y-2 group shadow-sm">
             <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 flex items-center justify-center group-hover:scale-110 transition shadow-sm">
               <ShieldCheck className="h-6 w-6" />
             </div>
-            <h3 className="font-bold text-base text-slate-900 dark:text-white">100% Genuine Guarantee</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Authentic products directly from brands</p>
+            <h3 className="font-bold text-base text-slate-900 dark:text-white">1-Year Official Warranty</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">100% authentic tech with brand coverage</p>
           </div>
 
           <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 backdrop-blur-xl hover:border-amber-400/40 transition duration-300 space-y-2 group shadow-sm">
             <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-300 flex items-center justify-center group-hover:scale-110 transition shadow-sm">
               <RotateCcw className="h-6 w-6" />
             </div>
-            <h3 className="font-bold text-base text-slate-900 dark:text-white">7-Day Easy Returns</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Hassle-free return & exchange policy</p>
+            <h3 className="font-bold text-base text-slate-900 dark:text-white">7-Day Easy Exchange</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Hassle-free return policy & instant refunds</p>
           </div>
 
           <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 backdrop-blur-xl hover:border-teal-400/40 transition duration-300 space-y-2 group shadow-sm">
             <div className="w-12 h-12 rounded-2xl bg-teal-100 dark:bg-teal-500/20 text-teal-600 dark:text-teal-300 flex items-center justify-center group-hover:scale-110 transition shadow-sm">
               <BadgeCheck className="h-6 w-6" />
             </div>
-            <h3 className="font-bold text-base text-slate-900 dark:text-white">Secure Encrypted Checkout</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">256-bit SSL encrypted online payments</p>
+            <h3 className="font-bold text-base text-slate-900 dark:text-white">256-Bit Encrypted Payments</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">PCI-DSS compliant via Razorpay, UPI & COD</p>
           </div>
+
 
         </div>
       </section>

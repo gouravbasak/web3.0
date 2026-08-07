@@ -6,6 +6,8 @@ import "./globals.css";
 import AppShell from "@/components/appShell";
 import { CartProvider } from "../app/context/CartContext";
 import { Toaster } from "react-hot-toast";
+import { Analytics } from "@vercel/analytics/react";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,9 +20,41 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Shop-it",
-  description: "E-commerce store with smart features",
+  title: {
+    default: "IONYX | Certified Fast Chargers, Power Banks & Pro Audio",
+    template: "%s | IONYX Store",
+  },
+  description:
+    "Shop certified high-speed MagSafe power banks, 240W USB-C fast charging cables, noise-canceling pro audio gear, and authentic electronics with express delivery and official warranty.",
+  keywords: [
+    "power bank",
+    "fast charger",
+    "magsafe power bank",
+    "240w usb c cable",
+    "wireless earphones",
+    "noise canceling headphones",
+    "ionyx electronics",
+    "buy electronics online",
+  ],
+  authors: [{ name: "IONYX Electronics" }],
+  metadataBase: new URL("https://shopit-lilac-rho.vercel.app"),
+  openGraph: {
+    title: "IONYX | Certified Fast Chargers, Power Banks & Pro Audio",
+    description:
+      "Shop certified high-speed MagSafe power banks, fast charging cables, and pro audio gear with express delivery and official warranty.",
+    url: "https://shopit-lilac-rho.vercel.app",
+    siteName: "IONYX Store",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "IONYX | Certified Electronics & Fast Power Tech",
+    description:
+      "High-speed power banks, fast chargers, and pro-grade audio gear.",
+  },
 };
+
 
 export default function RootLayout({
   children,
@@ -84,6 +118,7 @@ export default function RootLayout({
 
         <CartProvider>
           <AppShell>{children}</AppShell>
+          <Analytics />
         </CartProvider>
       </body>
     </html>

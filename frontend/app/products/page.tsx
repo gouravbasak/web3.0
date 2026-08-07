@@ -325,19 +325,20 @@ function EnterpriseProductListContent() {
             <div className="lg:col-span-7 space-y-5">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-white/10 border border-slate-200 dark:border-white/15 text-emerald-700 dark:text-emerald-300 text-xs font-semibold uppercase tracking-widest shadow-sm backdrop-blur-xl">
                 <Sparkles className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-                Enterprise Store Showcase
+                Official Electronics Catalog
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
-                Engineered for <br />
+                Pro Power Banks & <br />
                 <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-slate-900 dark:from-emerald-400 dark:via-teal-300 dark:to-white bg-clip-text text-transparent">
-                  Next Generation
+                  Fast Charging Tech
                 </span>
               </h1>
 
               <p className="text-slate-600 dark:text-gray-300 text-sm sm:text-base max-w-lg leading-relaxed">
-                Explore pro-grade equipment, solid-state powerbanks, and authentic gear designed for uncompromised performance.
+                Browse factory-certified MagSafe power banks, 240W fast chargers, pro audio earphones, and durable accessories with official brand warranty.
               </p>
+
 
               {/* SEARCH BAR */}
               <div className="relative max-w-md">
