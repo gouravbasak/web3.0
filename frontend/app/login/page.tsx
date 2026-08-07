@@ -5,8 +5,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Eye, EyeOff, Mail, Lock, LogIn, ArrowRight, Shield, Zap, Sparkles } from "lucide-react";
+import { getApiBaseUrl } from "@/lib/apiBase";
 
-const API = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+const API = getApiBaseUrl();
 
 export default function LoginPage() {
   const router = useRouter();

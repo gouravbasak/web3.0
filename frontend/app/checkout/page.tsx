@@ -40,7 +40,9 @@ declare global {
   }
 }
 
-const API = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+import { getApiBaseUrl } from "@/lib/apiBase";
+
+const API = getApiBaseUrl();
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -119,7 +121,7 @@ export default function CheckoutPage() {
       
       setLoadingVoucher(true);
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/api/auth/vouchers`, {
+        const res = await fetch(`${API}/api/auth/vouchers`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         

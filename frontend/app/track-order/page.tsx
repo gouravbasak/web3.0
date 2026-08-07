@@ -19,8 +19,9 @@ import {
   Loader2,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { getApiBaseUrl } from "@/lib/apiBase";
 
-const API = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+const API = getApiBaseUrl();
 
 type OrderItem = {
   productId: string;
@@ -68,8 +69,7 @@ function TrackOrderContent() {
     setLoading(true);
     setError(null);
 
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE || 
-      (typeof window !== "undefined" ? `${window.location.protocol}//${window.location.hostname}:4000` : "http://localhost:4000");
+    const baseUrl = API;
 
     try {
       const res = await fetch(`${baseUrl}/api/orders/track/${encodeURIComponent(queryId.trim())}`, {

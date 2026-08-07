@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Mail, KeyRound, ArrowRight, ShieldCheck, CheckCircle2, AlertCircle, RefreshCw, Lock } from "lucide-react";
 import toast from "react-hot-toast";
+import { getApiBaseUrl } from "@/lib/apiBase";
 
 function AdminLoginForm() {
   const router = useRouter();
@@ -19,7 +20,7 @@ function AdminLoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  const API = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+  const API = getApiBaseUrl();
 
   /* ================= STEP 1: REQUEST OTP TO EMAIL ================= */
   const handleRequestOtp = async (e: React.FormEvent) => {

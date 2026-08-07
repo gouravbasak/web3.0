@@ -24,8 +24,9 @@ import {
   CheckCircle2,
   Loader2
 } from "lucide-react";
+import { getApiBaseUrl } from "@/lib/apiBase";
 
-const API = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+const API = getApiBaseUrl();
 
 type TabType = "info" | "orders" | "vouchers" | "address";
 
