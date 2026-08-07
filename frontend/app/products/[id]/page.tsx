@@ -171,12 +171,14 @@ export default async function ProductPage({
         </div>
 
         {/* COMPACT & CLEAN CUSTOMER REVIEWS */}
-        <section className="bg-white dark:bg-zinc-900/80 border border-slate-200/80 dark:border-zinc-800/80 rounded-3xl p-6 sm:p-8 shadow-sm">
-          <ProductReviewsCarousel
-            productId={product._id}
-            initialReviews={formattedReviews}
-          />
-        </section>
+        {formattedReviews && formattedReviews.length > 0 && (
+          <section className="bg-white dark:bg-zinc-900/80 border border-slate-200/80 dark:border-zinc-800/80 rounded-3xl p-6 sm:p-8 shadow-sm">
+            <ProductReviewsCarousel
+              productId={product._id}
+              initialReviews={formattedReviews}
+            />
+          </section>
+        )}
 
         {/* FAQ ACCORDION */}
         <div className="bg-white dark:bg-zinc-900/80 border border-slate-200/80 dark:border-zinc-800/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
