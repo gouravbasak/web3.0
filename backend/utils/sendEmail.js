@@ -6,13 +6,20 @@ const baseTemplate = require("./emailTemplates/baseTemplate");
 
 /* ================= MAIL TRANSPORT ================= */
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER, // Gmail
-    pass: process.env.EMAIL_PASS, // App password
-  },
-});
+function getTransporter() {
+  const user = (process.env.EMAIL_USER || "").trim();
+  const pass = (process.env.EMAIL_PASS || "").trim();
+
+  return nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user,
+      pass,
+    },
+  });
+}
 
 /* ================= ORDER CREATED ================= */
 
@@ -81,7 +88,7 @@ async function sendOrderCreatedEmail({ to, name, orderId, total, items = [] }) {
     `,
   });
 
-  await transporter.sendMail({
+  await getTransporter().sendMail({
     from: `"IONYX Store" <${process.env.EMAIL_USER}>`,
     to,
     subject: `Order Confirmed • #${orderId}`,
@@ -98,7 +105,7 @@ async function sendOrderCancelledEmail({ to, name, orderId, total }) {
     total,
   });
 
-  await transporter.sendMail({
+  await getTransporter().sendMail({
     from: `"IONYX Store" <${process.env.EMAIL_USER}>`,
     to,
     subject: `Order Cancelled • #${orderId}`,
@@ -128,7 +135,7 @@ async function sendAdminOtpEmail({ to, name, otp }) {
     `,
   });
 
-  await transporter.sendMail({
+  await getTransporter().sendMail({
     from: `"IONYX Security" <${process.env.EMAIL_USER}>`,
     to,
     subject: `Your Admin Access Passcode • ${otp}`,

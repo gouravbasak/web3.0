@@ -78,7 +78,7 @@ router.post("/request-otp", async (req, res) => {
       console.log(`[ADMIN AUTH] Sent login OTP ${otp} to ${cleanEmail}`);
     } catch (emailErr) {
       console.error("Email send failed for admin OTP:", emailErr);
-      return res.status(500).json({ message: "Failed to send email verification code." });
+      return res.status(500).json({ message: `Failed to send email verification code: ${emailErr.message || emailErr}` });
     }
 
     return res.json({
