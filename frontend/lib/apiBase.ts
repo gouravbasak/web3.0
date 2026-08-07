@@ -1,6 +1,14 @@
 export function getApiBaseUrl(): string {
-  // Always use HTTPS production backend when on hosted environment
+  // Client-side check on Render / Production domain
   if (typeof window !== "undefined" && window.location.hostname.includes("onrender.com")) {
+    return "https://shopit-backend-4g44.onrender.com";
+  }
+
+  // Server-side check on Render / Production deployment
+  if (
+    typeof process !== "undefined" &&
+    (process.env.RENDER || process.env.NODE_ENV === "production")
+  ) {
     return "https://shopit-backend-4g44.onrender.com";
   }
 

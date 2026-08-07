@@ -38,8 +38,9 @@ type Product = {
 
 async function getProduct(id: string): Promise<Product | null> {
   try {
+    const api = getApiBaseUrl();
     const res = await fetch(
-      `${API}/api/products/${id}`,
+      `${api}/api/products/${id}`,
       { cache: "no-store" }
     );
 
@@ -52,8 +53,9 @@ async function getProduct(id: string): Promise<Product | null> {
 
 async function getRelatedProducts(category: string, currentId: string): Promise<Product[]> {
   try {
+    const api = getApiBaseUrl();
     const res = await fetch(
-      `${API}/api/products?category=${encodeURIComponent(category)}&limit=5`,
+      `${api}/api/products?category=${encodeURIComponent(category)}&limit=5`,
       { cache: "no-store" }
     );
     
