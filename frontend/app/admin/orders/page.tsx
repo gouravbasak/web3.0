@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { getApiBaseUrl } from "@/lib/apiBase";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
@@ -78,7 +79,7 @@ export default function AdminOrdersPage() {
   const loadOrders = async () => {
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE}/api/orders`,
+        `${getApiBaseUrl()}/api/orders`,
         { credentials: "include" },
       );
 

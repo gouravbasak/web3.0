@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState, useRef } from "react";
+import { getApiBaseUrl } from "@/lib/apiBase";
 import { useReactToPrint } from "react-to-print";
 import {
   BarChart,
@@ -52,7 +53,7 @@ type Order = {
   paymentMethod?: string;
 };
 
-const API = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+const API = getApiBaseUrl();
 
 /* ================= BLUE GRADIENT ================= */
 const BLUE_GRADIENT = [

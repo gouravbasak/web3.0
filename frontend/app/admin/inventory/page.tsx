@@ -14,8 +14,9 @@ type Product = {
   brand?: string;
   category?: string;
 };
+import { getApiBaseUrl } from "@/lib/apiBase";
 
-const BACKEND = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+const BACKEND = getApiBaseUrl();
 
 export default function AdminInventoryPage() {
   const [products, setProducts] = useState<Product[]>([]);

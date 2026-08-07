@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ShieldCheck, Loader2 } from "lucide-react";
+import { getApiBaseUrl } from "@/lib/apiBase";
 
-const API = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+const API = getApiBaseUrl();
 
 export default function AdminLayout({
   children,

@@ -33,8 +33,9 @@ type Product = {
   images?: string[];
   stock?: number;
 };
+import { getApiBaseUrl } from "@/lib/apiBase";
 
-const API = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+const API = getApiBaseUrl();
 
 export default function AdminProductsPage() {
   const [search, setSearch] = useState("");
