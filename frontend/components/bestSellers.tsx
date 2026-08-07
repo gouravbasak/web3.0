@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { BadgeCheck, ArrowRight, Star } from "lucide-react";
+import { getApiBaseUrl } from "@/lib/apiBase";
 
 type Product = {
   _id: string;
@@ -17,7 +18,7 @@ type Product = {
 
 export default function BestSellers() {
   const [products, setProducts] = useState<Product[]>([]);
-  const API = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+  const API = getApiBaseUrl();
 
   useEffect(() => {
     fetch(`${API}/api/products/best-sellers`)

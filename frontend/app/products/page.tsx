@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { getApiBaseUrl } from "@/lib/apiBase";
 import Link from "next/link";
 import AddToCartButton from "@/components/AddToCartButton";
 import {
@@ -96,7 +97,7 @@ function EnterpriseProductListContent() {
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [hoveredProductImage, setHoveredProductImage] = useState<Record<string, number>>({});
 
-  const API = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+  const API = getApiBaseUrl();
 
   /* ---------------- FETCH PRODUCTS ---------------- */
   useEffect(() => {
