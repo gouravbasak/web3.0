@@ -99,6 +99,71 @@ function EnterpriseProductListContent() {
 
   const API = getApiBaseUrl();
 
+  const [ads, setAds] = useState<Product[]>([]);
+  const [activeAdIndex, setActiveAdIndex] = useState(0);
+  const [loadingAds, setLoadingAds] = useState(true);
+  const [hasAdminSelectedAds, setHasAdminSelectedAds] = useState(false);
+
+  /* ---------------- FETCH AD PRODUCTS FOR HERO CAROUSEL ---------------- */
+  useEffect(() => {
+    async function fetchAds() {
+      try {
+        let res = await fetch(`${API}/api/products/featured`, { cache: "no-store" });
+        if (!res.ok) {
+          res = await fetch(`${API}/api/products?isFeatured=true`, { cache: "no-store" });
+        }
+
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            const featuredList = data.filter((p: any) => p.isFeatured);
+            if (featuredList.length > 0) {
+              setAds(featuredList);
+              setHasAdminSelectedAds(true);
+              return;
+            }
+          }
+        }
+
+        // Fallback if no admin ads: Top selling product
+        setHasAdminSelectedAds(false);
+        const topSellingRes = await fetch(`${API}/api/products/best-sellers`, { cache: "no-store" });
+        if (topSellingRes.ok) {
+          const bestSellers = await topSellingRes.json();
+          if (Array.isArray(bestSellers) && bestSellers.length > 0) {
+            setAds([bestSellers[0]]);
+            return;
+          }
+        }
+
+        const fallbackRes = await fetch(`${API}/api/products`, { cache: "no-store" });
+        if (fallbackRes.ok) {
+          const fallbackData = await fallbackRes.json();
+          if (Array.isArray(fallbackData) && fallbackData.length > 0) {
+            setAds([fallbackData[0]]);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load ad products on products page:", err);
+      } finally {
+        setLoadingAds(false);
+      }
+    }
+    fetchAds();
+  }, [API]);
+
+  // Auto slideshow for Ads
+  useEffect(() => {
+    if (ads.length <= 1) return;
+
+    const timer = setInterval(() => {
+      setActiveAdIndex((prev) => (prev + 1) % ads.length);
+    }, 4500);
+
+    return () => clearInterval(timer);
+  }, [ads.length]);
+
+
   /* ---------------- FETCH PRODUCTS ---------------- */
   useEffect(() => {
     async function load() {
@@ -295,56 +360,118 @@ function EnterpriseProductListContent() {
               </div>
             </div>
 
-            {/* HERO RIGHT FEATURED SPOTLIGHT CARD */}
-            {spotlightProduct && (
-              <div className="lg:col-span-5">
-                <div className="relative group p-6 rounded-3xl bg-white dark:bg-zinc-900/90 backdrop-blur-2xl border border-slate-200/80 dark:border-white/15 shadow-xl dark:shadow-2xl hover:border-emerald-500/40 transition duration-500">
-                  <div className="absolute top-4 right-4 bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-md">
-                    Featured Flagship
-                  </div>
+            {/* HERO RIGHT DYNAMIC AD SHOWCASE CAROUSEL */}
+            <div className="lg:col-span-5 flex justify-center">
+              <div className="w-full max-w-md relative group">
+                
+                {/* Background Shadow Glow */}
+                <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-3xl blur-2xl opacity-25 group-hover:opacity-40 transition duration-500" />
 
-                  <div className="w-full h-52 rounded-2xl overflow-hidden mb-4 bg-slate-100 dark:bg-zinc-900/60">
-                    <img
-                      src={spotlightProduct.images?.[0] || "/placeholder.png"}
-                      alt={spotlightProduct.title}
-                      className="w-full h-full object-cover transform transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-110"
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs text-emerald-600 dark:text-emerald-300 font-semibold mb-1">
-                    <span>{spotlightProduct.brand}</span>
-                    <span className="flex items-center gap-1 text-amber-500">
-                      <Star className="h-3.5 w-3.5 fill-amber-400" />
-                      {spotlightProduct.averageRating || 4.8}
-                    </span>
-                  </div>
-
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white line-clamp-1 mb-1">
-                    {spotlightProduct.title}
-                  </h3>
-
-                  <p className="text-xs text-slate-600 dark:text-gray-300 line-clamp-2 mb-4">
-                    {spotlightProduct.description}
-                  </p>
-
-                  <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-white/10">
-                    <div>
-                      <span className="text-xs text-slate-400 block">Starting at</span>
-                      <span className="text-xl font-black text-slate-900 dark:text-white">
-                        ₹{spotlightProduct.price?.toLocaleString("en-IN")}
-                      </span>
+                {/* Main Editorial Card Container */}
+                <div className="relative bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800/80 rounded-3xl p-6 shadow-xl dark:shadow-2xl overflow-hidden transition-all duration-300 min-h-[440px]">
+                  
+                  {loadingAds ? (
+                    <div className="h-[400px] flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500" />
                     </div>
+                  ) : ads.length > 0 ? (
+                    (() => {
+                      const currentAd = ads[activeAdIndex];
+                      const discount = currentAd.mrp && currentAd.mrp > currentAd.price
+                        ? Math.round(((currentAd.mrp - currentAd.price) / currentAd.mrp) * 100)
+                        : 0;
 
-                    <Link
-                      href={`/products/${spotlightProduct._id}`}
-                      className="inline-flex items-center gap-1.5 bg-emerald-600 dark:bg-white text-white dark:text-zinc-950 hover:bg-emerald-700 dark:hover:bg-emerald-50 font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-md"
-                    >
-                      Explore Specs <ArrowRight className="h-3.5 w-3.5" />
-                    </Link>
-                  </div>
+                      return (
+                        <div key={currentAd._id} className="animate-in fade-in duration-500 flex flex-col justify-between h-full">
+                          {/* Top Badge & Slide Indicator */}
+                          <div className="flex items-center justify-between mb-4">
+                            <span className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5">
+                              <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                              </span>
+                              {hasAdminSelectedAds 
+                                ? `★ Featured Ad ${ads.length > 1 ? `(${activeAdIndex + 1}/${ads.length})` : ""}`
+                                : "★ Top Selling Product"}
+                            </span>
+                            <span className="flex items-center gap-1 text-xs font-bold text-amber-500">
+                              <Star className="h-3.5 w-3.5 fill-amber-400" /> {currentAd.averageRating || "4.9"} ({currentAd.reviewCount || 12}+ Reviews)
+                            </span>
+                          </div>
+
+                          {/* Image Container with Fixed Bounds & Crisp Object-Contain Fit */}
+                          <div className="w-full h-60 rounded-2xl overflow-hidden mb-4 relative bg-slate-100 dark:bg-zinc-950 flex items-center justify-center p-3">
+                            <img
+                              src={currentAd.images?.[0] || "/placeholder.png"}
+                              alt={currentAd.title}
+                              className="w-full h-full object-contain p-2 transform group-hover:scale-105 transition-transform duration-700 ease-out"
+                            />
+                            {discount > 0 && (
+                              <span className="absolute top-3 left-3 bg-red-600 text-white font-black text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md">
+                                {discount}% OFF
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Editorial Copy */}
+                          <div className="space-y-1.5">
+                            <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block">
+                              {currentAd.brand || "IONYX Select"} • {currentAd.category}
+                            </span>
+                            <h3 className="text-xl font-black text-slate-900 dark:text-white leading-tight truncate">
+                              {currentAd.title}
+                            </h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed h-8">
+                              {currentAd.description}
+                            </p>
+                          </div>
+
+                          {/* Bottom Price & Call To Action */}
+                          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between">
+                            <div>
+                              <span className="text-[10px] uppercase font-bold text-slate-400 block">Special Offer</span>
+                              <div className="flex items-baseline gap-2">
+                                <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">₹{currentAd.price?.toLocaleString("en-IN")}</span>
+                                {currentAd.mrp && currentAd.mrp > currentAd.price && (
+                                  <span className="text-xs text-slate-400 line-through">₹{currentAd.mrp.toLocaleString("en-IN")}</span>
+                                )}
+                              </div>
+                            </div>
+
+                            <Link
+                              href={`/products/${currentAd._id}`}
+                              className="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-md hover:scale-105"
+                            >
+                              Shop Now <ArrowRight className="h-4 w-4" />
+                            </Link>
+                          </div>
+
+                          {/* CAROUSEL PROGRESS DOTS */}
+                          {ads.length > 1 && (
+                            <div className="flex items-center justify-center gap-2 mt-3 pt-1">
+                              {ads.map((_, i) => (
+                                <button
+                                  key={i}
+                                  onClick={() => setActiveAdIndex(i)}
+                                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                                    i === activeAdIndex ? "w-6 bg-emerald-500" : "w-1.5 bg-slate-300 dark:bg-zinc-700"
+                                  }`}
+                                  aria-label={`Go to slide ${i + 1}`}
+                                />
+                              ))}
+                            </div>
+                          )}
+
+                        </div>
+                      );
+                    })()
+                  ) : null}
+
                 </div>
+
               </div>
-            )}
+            </div>
+
           </div>
         </div>
       </section>
@@ -565,7 +692,7 @@ function EnterpriseProductListContent() {
                     <img
                       src={p.images?.[0] || "/placeholder.png"}
                       alt={p.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                      className="w-full h-full object-contain p-2 group-hover:scale-105 transition duration-500"
                     />
                   </Link>
 
@@ -673,7 +800,7 @@ function EnterpriseProductListContent() {
                         <img
                           src={p.images?.[0] || "/placeholder.png"}
                           alt={p.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                          className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500 ease-out"
                         />
                       </Link>
 
