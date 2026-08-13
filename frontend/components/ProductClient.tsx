@@ -6,6 +6,7 @@ import AddToCartButton from "./AddToCartButton";
 import BuyNowButton from "./BuyNowButton";
 import ProductPurchaseOptions from "./ProductPurchaseOptions";
 import { BadgeCheck, Star, Flame, CheckCircle2, ShieldCheck, Zap, PackageCheck } from "lucide-react";
+import { useCurrency } from "@/app/context/CurrencyContext";
 
 type Product = {
   _id: string;
@@ -45,6 +46,7 @@ type Props = {
 };
 
 export default function ProductClient({ product, images }: Props) {
+  const { formatPrice } = useCurrency();
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [quantity, setQuantity] = useState(1);
   const [currentPrice, setCurrentPrice] = useState(product.price);
@@ -122,17 +124,18 @@ export default function ProductClient({ product, images }: Props) {
         </span>
       </div>
 
+// ... inside render:
       {/* PRICE DISPLAY HERO - SINGLE UNIFIED PRICE + DYNAMIC TOTAL CALCULATION */}
       <div className="p-5 rounded-2xl bg-slate-50 dark:bg-zinc-800/40 border border-slate-200/80 dark:border-zinc-800 flex flex-col gap-2">
         <div className="flex items-baseline flex-wrap gap-3">
           <span className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
-            ₹{currentPrice?.toLocaleString("en-IN")}
+            {formatPrice(currentPrice)}
           </span>
 
           {product.mrp && product.mrp > currentPrice && (
             <>
               <span className="text-base text-slate-400 line-through font-medium">
-                ₹{product.mrp.toLocaleString("en-IN")}
+                {formatPrice(product.mrp)}
               </span>
               <span className="px-2.5 py-1 text-xs font-black uppercase rounded-lg bg-rose-600 text-white shadow-sm">
                 {discountPercent}% OFF
@@ -146,7 +149,7 @@ export default function ProductClient({ product, images }: Props) {
           <div className="pt-2 mt-1 border-t border-slate-200/60 dark:border-zinc-700/60 flex items-center justify-between text-xs font-bold text-emerald-600 dark:text-emerald-300">
             <span>Subtotal ({quantity} items)</span>
             <span className="text-lg font-black text-slate-900 dark:text-white">
-              ₹{(currentPrice * quantity).toLocaleString("en-IN")}
+              {formatPrice(currentPrice * quantity)}
             </span>
           </div>
         )}

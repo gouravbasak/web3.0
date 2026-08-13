@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
+import { useCurrency } from "../context/CurrencyContext";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ const STANDARD_SHIPPING_COST = 9.90;
 
 export default function CartPage() {
   const { cart, updateQty, removeItem, clearCart } = useCart();
+  const { formatPrice } = useCurrency();
   const router = useRouter();
 
   const subtotal = cart.reduce((s, it) => s + it.price * it.qty, 0);
@@ -303,7 +305,7 @@ export default function CartPage() {
 
                       <div className="flex items-center gap-4">
                         <span className="font-semibold">
-                          ₹{(item.price * item.qty).toFixed(2)}
+                          {formatPrice(item.price * item.qty)}
                         </span>
                         <Button
                           variant="ghost"
@@ -446,7 +448,7 @@ export default function CartPage() {
             <div className="space-y-3 mb-4">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span className="font-medium">₹{subtotal.toFixed(2)}</span>
+                <span className="font-medium">{formatPrice(subtotal)}</span>
               </div>
               
               <div className="flex justify-between text-sm">
@@ -454,13 +456,13 @@ export default function CartPage() {
                 {shippingCost === 0 ? (
                   <span className="text-green-600 font-medium">FREE</span>
                 ) : (
-                  <span className="font-medium">₹{shippingCost.toFixed(2)}</span>
+                  <span className="font-medium">{formatPrice(shippingCost)}</span>
                 )}
               </div>
 
               {shippingCost > 0 && subtotal < FREE_SHIPPING_THRESHOLD && (
                 <p className="text-xs text-amber-600 pt-1">
-                  Add ₹{amountForFreeShipping.toFixed(2)} more for free shipping
+                  Add {formatPrice(amountForFreeShipping)} more for free shipping
                 </p>
               )}
 
@@ -468,13 +470,13 @@ export default function CartPage() {
 
               <div className="flex justify-between font-semibold text-lg pt-1">
                 <span>Total</span>
-                <span>₹{total.toFixed(2)}</span>
+                <span>{formatPrice(total)}</span>
               </div>
 
               {/* Prepaid Discounted Total (Shown for comparison) */}
               <div className="flex justify-between text-sm text-blue-600 dark:text-blue-400 pt-2">
                 <span>With prepaid discount</span>
-                <span className="font-medium">₹{discountedTotal.toFixed(2)}</span>
+                <span className="font-medium">{formatPrice(discountedTotal)}</span>
               </div>
             </div>
 

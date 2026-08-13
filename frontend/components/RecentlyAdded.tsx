@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Sparkles, ArrowRight } from "lucide-react";
 import { getApiBaseUrl } from "@/lib/apiBase";
+import { useCurrency } from "@/app/context/CurrencyContext";
 
 type Product = {
   _id: string;
@@ -16,6 +17,7 @@ type Product = {
 
 export default function RecentlyAddedCarousel() {
   const [products, setProducts] = useState<Product[]>([]);
+  const { formatPrice } = useCurrency();
   const API = getApiBaseUrl();
 
   useEffect(() => {
@@ -91,11 +93,11 @@ export default function RecentlyAddedCarousel() {
                   {/* PRICE */}
                   <div className="mt-3 pt-2 border-t border-slate-100 dark:border-white/10 flex items-baseline justify-between">
                     <span className="text-lg font-black text-slate-900 dark:text-white">
-                      ₹{p.price?.toLocaleString("en-IN")}
+                      {formatPrice(p.price)}
                     </span>
                     {p.mrp && p.mrp > p.price && (
                       <span className="text-xs text-slate-400 line-through">
-                        ₹{p.mrp.toLocaleString("en-IN")}
+                        {formatPrice(p.mrp)}
                       </span>
                     )}
                   </div>

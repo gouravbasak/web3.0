@@ -6,8 +6,10 @@ import AddToCartButton from "./AddToCartButton";
 import { Badge } from "@/components/ui/badge";
 import { BadgeCheck, Heart, Star, Sparkles } from "lucide-react";
 import { getValidImageUrl } from "@/lib/getImageUrl";
+import { useCurrency } from "@/app/context/CurrencyContext";
 
 export default function ProductCard({ product }: any) {
+  const { formatPrice } = useCurrency();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const outOfStock = typeof product.stock === "number" && product.stock <= 0;
   const isLowStock = typeof product.stock === "number" && product.stock > 0 && product.stock <= 5;
@@ -149,11 +151,11 @@ export default function ProductCard({ product }: any) {
       <div className="pt-2 border-t border-gray-100 dark:border-zinc-800/80">
         <div className="flex items-baseline gap-2 mb-3">
           <span className="text-xl font-extrabold text-gray-900 dark:text-white">
-            ₹{product.price?.toLocaleString("en-IN")}
+            {formatPrice(product.price)}
           </span>
           {product.mrp && product.mrp > product.price && (
             <span className="text-xs text-gray-400 line-through">
-              ₹{product.mrp.toLocaleString("en-IN")}
+              {formatPrice(product.mrp)}
             </span>
           )}
           {isLowStock && (

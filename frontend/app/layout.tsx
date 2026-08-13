@@ -5,6 +5,7 @@ import "./globals.css";
 
 import AppShell from "@/components/appShell";
 import { CartProvider } from "../app/context/CartContext";
+import { CurrencyProvider } from "../app/context/CurrencyContext";
 import { Toaster } from "react-hot-toast";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -118,9 +119,11 @@ export default function RootLayout({
         />
 
         <CartProvider>
-          <AppShell>{children}</AppShell>
-          <Analytics />
-          <SpeedInsights />
+          <CurrencyProvider>
+            <AppShell>{children}</AppShell>
+            <Analytics />
+            <SpeedInsights />
+          </CurrencyProvider>
         </CartProvider>
       </body>
     </html>

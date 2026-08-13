@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { getApiBaseUrl } from "@/lib/apiBase";
 import { getValidImageUrl } from "@/lib/getImageUrl";
+import { useCurrency } from "@/app/context/CurrencyContext";
 
 const API = getApiBaseUrl();
 
@@ -37,6 +38,7 @@ type AdProduct = {
 };
 
 export default function UniversalLanding({ initialAds = [], initialHasAdminSelected = false }: { initialAds?: AdProduct[], initialHasAdminSelected?: boolean }) {
+  const { formatPrice } = useCurrency();
   const [ads, setAds] = useState<AdProduct[]>(initialAds);
   const [activeAdIndex, setActiveAdIndex] = useState(0);
   const [hasAdminSelectedAds, setHasAdminSelectedAds] = useState(initialHasAdminSelected);
@@ -203,9 +205,9 @@ export default function UniversalLanding({ initialAds = [], initialHasAdminSelec
                             <div>
                               <span className="text-[10px] uppercase font-bold text-slate-400 block">Special Offer</span>
                               <div className="flex items-baseline gap-2">
-                                <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">₹{currentAd.price.toLocaleString()}</span>
+                                <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{formatPrice(currentAd.price)}</span>
                                 {currentAd.mrp && currentAd.mrp > currentAd.price && (
-                                  <span className="text-xs text-slate-400 line-through">₹{currentAd.mrp.toLocaleString()}</span>
+                                  <span className="text-xs text-slate-400 line-through">{formatPrice(currentAd.mrp)}</span>
                                 )}
                               </div>
                             </div>
