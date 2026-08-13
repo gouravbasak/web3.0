@@ -53,8 +53,7 @@ export default function AdminInventoryPage() {
       const res = await fetch(`${BACKEND}/api/admin/products/${id}`, { credentials: "include", 
         method: "PUT",
         headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
-        body: JSON.stringify({ $incStock: delta  }),
-        credentials: "include", // send admin cookie if required
+        body: JSON.stringify({ $incStock: delta  })
       });
       if (!res.ok) {
         const errBody = await res.json().catch(() => ({}));
