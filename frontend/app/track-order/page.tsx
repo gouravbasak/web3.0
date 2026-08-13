@@ -72,9 +72,9 @@ function TrackOrderContent() {
     const baseUrl = API;
 
     try {
-      const res = await fetch(`${baseUrl}/api/orders/track/${encodeURIComponent(queryId.trim())}`, {
+      const res = await fetch(`${baseUrl}/api/orders/track/${encodeURIComponent(queryId.trim())}`, { credentials: "include", 
         headers: { "Accept": "application/json" },
-      });
+       });
       
       const data = await res.json().catch(() => null);
 

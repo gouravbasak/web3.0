@@ -1,9 +1,16 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const rateLimit = require("express-rate-limit");
 const Admin = require("../models/Admin");
 
 const router = express.Router();
+
+const adminLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 admin auth requests per window
+  message: { message: "Too many attempts from this IP, please try again after 15 minutes" }
+});
 
 // --- CONFIG ---
 const JWT_SECRET = process.env.JWT_ADMIN_SECRET;
@@ -38,7 +45,7 @@ function isAuthorizedAdminEmail(email) {
 // =====================================================
 //   1️⃣ REQUEST ADMIN OTP CODE (SEND TO EMAIL)
 // =====================================================
-router.post("/request-otp", async (req, res) => {
+router.post("/request-otp", adminLimiter, async (req, res) => {
   try {
     const { email } = req.body || {};
     if (!email) {
@@ -58,7 +65,7 @@ router.post("/request-otp", async (req, res) => {
       admin = await Admin.create({
         email: cleanEmail,
         name: "System Admin",
-        passwordHash: await bcrypt.hash(process.env.ADMIN_PASS || "Admin#2026$7k9P", 10),
+        passwordHash: await bcrypt.hash(process.env.ADMIN_PASS || "Admin#2026$7k9P", 12),
       });
     }
 
@@ -95,7 +102,7 @@ router.post("/request-otp", async (req, res) => {
 // =====================================================
 //   2️⃣ VERIFY ADMIN OTP CODE & LOG IN
 // =====================================================
-router.post("/verify-otp", async (req, res) => {
+router.post("/verify-otp", adminLimiter, async (req, res) => {
   try {
     const { email, otp } = req.body || {};
 
@@ -147,7 +154,6 @@ router.post("/verify-otp", async (req, res) => {
 
     return res.json({
       ok: true,
-      token,
       admin: { id: admin._id, email: admin.email, name: admin.name },
     });
   } catch (err) {
@@ -159,7 +165,7 @@ router.post("/verify-otp", async (req, res) => {
 // =======================
 //      ADMIN LOGIN (PASSWORD FALLBACK)
 // =======================
-router.post("/login", async (req, res) => {
+router.post("/login", adminLimiter, async (req, res) => {
   try {
     const { email, password } = req.body || {};
 
@@ -181,7 +187,7 @@ router.post("/login", async (req, res) => {
       admin = await Admin.create({
         email: cleanEmail,
         name: "System Admin",
-        passwordHash: await bcrypt.hash(expectedMasterPass, 10),
+        passwordHash: await bcrypt.hash(expectedMasterPass, 12),
       });
     }
 
@@ -189,7 +195,7 @@ router.post("/login", async (req, res) => {
 
     if (!passwordOk && (password === expectedMasterPass || password === "Admin#2026$7k9P")) {
       passwordOk = true;
-      admin.passwordHash = await bcrypt.hash(expectedMasterPass, 10);
+      admin.passwordHash = await bcrypt.hash(expectedMasterPass, 12);
       await admin.save();
     }
 
@@ -210,7 +216,6 @@ router.post("/login", async (req, res) => {
 
     return res.json({
       ok: true,
-      token,
       admin: { id: admin._id, email: admin.email, name: admin.name },
     });
   } catch (err) {

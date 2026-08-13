@@ -8,9 +8,9 @@ export default async function ViewOrderPage({ params }: { params: Promise<{ id: 
 
   try {
     const apiBase = getApiBaseUrl();
-    const res = await fetch(`${apiBase}/api/orders/${id}`, {
+    const res = await fetch(`${apiBase}/api/orders/${id}`, { credentials: "include", 
       cache: "no-store",
-    });
+     });
 
     if (res.ok) {
       order = await res.json();

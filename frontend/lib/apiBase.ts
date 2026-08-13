@@ -27,8 +27,7 @@ export function getApiBaseUrl(): string {
 
 
 export function getAdminAuthHeaders(): Record<string, string> {
-  const token = typeof window !== "undefined" ? localStorage.getItem("adminToken") || "" : "";
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  return {}; // HttpOnly cookies are used now, headers are not needed.
 }
 
 export const API_BASE = getApiBaseUrl();

@@ -121,9 +121,9 @@ export default function CheckoutPage() {
       
       setLoadingVoucher(true);
       try {
-        const res = await fetch(`${API}/api/auth/vouchers`, {
+        const res = await fetch(`${API}/api/auth/vouchers`, { credentials: "include", 
           headers: { Authorization: `Bearer ${token}` }
-        });
+         });
         
         if (res.ok) {
           const data = await res.json();
@@ -219,11 +219,11 @@ export default function CheckoutPage() {
   const placeOrder = async (payload: any) => {
     const token = localStorage.getItem("token");
 
-    const res = await fetch(`${API}/api/orders`, {
+    const res = await fetch(`${API}/api/orders`, { credentials: "include", 
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : { }),
       },
       body: JSON.stringify(payload),
     });
@@ -292,10 +292,10 @@ export default function CheckoutPage() {
         const payableAmount = Math.max(1, Math.round(discountedTotal));
 
         // Create Razorpay order
-        const res = await fetch(`${API}/api/payments/create-order`, {
+        const res = await fetch(`${API}/api/payments/create-order`, { credentials: "include", 
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount: payableAmount }),
+          body: JSON.stringify({ amount: payableAmount  }),
         });
 
         const razorpayOrder = await res.json();

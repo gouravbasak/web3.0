@@ -35,10 +35,10 @@ function AdminLoginForm() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API}/api/admin/request-otp`, {
+      const res = await fetch(`${API}/api/admin/request-otp`, { credentials: "include", 
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email  }),
       });
 
       const data = await res.json().catch(() => ({ message: "Unexpected response" }));
@@ -88,9 +88,6 @@ function AdminLoginForm() {
         return;
       }
 
-      if (data.token) {
-        localStorage.setItem("adminToken", data.token);
-      }
       if (data.admin) {
         localStorage.setItem("adminUser", JSON.stringify(data.admin));
       }
@@ -131,9 +128,6 @@ function AdminLoginForm() {
         return;
       }
 
-      if (data.token) {
-        localStorage.setItem("adminToken", data.token);
-      }
       if (data.admin) {
         localStorage.setItem("adminUser", JSON.stringify(data.admin));
       }

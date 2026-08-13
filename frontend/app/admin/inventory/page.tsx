@@ -32,7 +32,7 @@ export default function AdminInventoryPage() {
   const loadProducts = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${BACKEND}/api/products`, { cache: "no-store" });
+      const res = await fetch(`${BACKEND}/api/products`, { credentials: "include",  cache: "no-store"  });
       if (!res.ok) {
         const body = await res.text().catch(() => "");
         console.error("Products fetch failed", res.status, body);
@@ -50,10 +50,10 @@ export default function AdminInventoryPage() {
 
   const adjustStock = async (id: string, delta: number) => {
     try {
-      const res = await fetch(`${BACKEND}/api/admin/products/${id}`, {
+      const res = await fetch(`${BACKEND}/api/admin/products/${id}`, { credentials: "include", 
         method: "PUT",
         headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
-        body: JSON.stringify({ $incStock: delta }),
+        body: JSON.stringify({ $incStock: delta  }),
         credentials: "include", // send admin cookie if required
       });
       if (!res.ok) {

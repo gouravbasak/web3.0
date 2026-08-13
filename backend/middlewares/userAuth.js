@@ -2,9 +2,7 @@ const jwt = require("jsonwebtoken");
 
 module.exports = function userAuth(req, res, next) {
   try {
-    const token =
-      req.cookies?.token ||
-      req.headers.authorization?.replace("Bearer ", "");
+    const token = req.cookies?.token;
 
     if (!token) {
       return res.status(401).json({ message: "Not authenticated" });

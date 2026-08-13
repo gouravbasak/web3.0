@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useCart } from "../app/context/CartContext";
 import { useDarkMode } from "@/lib/useDarkMode";
+import { API_BASE } from "@/lib/apiBase";
 
 /* ================= NAVBAR ================= */
 
@@ -36,10 +37,9 @@ export default function Navbar() {
   /* ---------- AUTH REAL-TIME SYNCHRONIZATION ---------- */
   useEffect(() => {
     const syncAuth = () => {
-      const token = localStorage.getItem("token");
       const userStr = localStorage.getItem("user");
 
-      if (token && userStr) {
+      if (userStr) {
         try {
           const user = JSON.parse(userStr);
           setIsLoggedIn(true);
@@ -95,8 +95,10 @@ export default function Navbar() {
   };
 
   /* ---------- LOGOUT ---------- */
-  const handleLogout = () => {
-    localStorage.removeItem("token");
+  const handleLogout = async () => {
+    try {
+      await fetch(`${API_BASE}/api/auth/logout`, { method: 'POST', credentials: 'include' });
+    } catch (e) {}
     localStorage.removeItem("user");
     setIsLoggedIn(false);
     setUserName(null);

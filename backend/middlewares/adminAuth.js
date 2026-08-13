@@ -1,11 +1,7 @@
 const jwt = require("jsonwebtoken");
 
 module.exports = function adminAuth(req, res, next) {
-  const token =
-    req.cookies?.adminToken ||
-    (req.headers.authorization?.startsWith("Bearer ")
-      ? req.headers.authorization.split(" ")[1]
-      : null);
+  const token = req.cookies?.adminToken;
 
   if (!token) return res.status(401).json({ message: "Admin not logged in" });
 

@@ -136,9 +136,9 @@ export default function OrderDetailsPage() {
       }
 
       try {
-        const res = await fetch(`${API}/api/orders/${params.id}`, {
+        const res = await fetch(`${API}/api/orders/${params.id}`, { credentials: "include", 
           headers: { Authorization: `Bearer ${token}` },
-        });
+         });
 
         if (!res.ok) {
           throw new Error("Failed to fetch order");
@@ -169,13 +169,13 @@ export default function OrderDetailsPage() {
 
     setCancelling(true);
     try {
-      const res = await fetch(`${API}/api/orders/${params.id}/cancel`, {
+      const res = await fetch(`${API}/api/orders/${params.id}/cancel`, { credentials: "include", 
         method: "PUT",
         headers: { 
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}` 
         },
-      });
+       });
 
       if (!res.ok) {
         throw new Error("Failed to cancel order");
@@ -184,9 +184,9 @@ export default function OrderDetailsPage() {
       toast.success("Order cancelled successfully");
       
       // Refresh order data
-      const updatedRes = await fetch(`${API}/api/orders/${params.id}`, {
+      const updatedRes = await fetch(`${API}/api/orders/${params.id}`, { credentials: "include", 
         headers: { Authorization: `Bearer ${token}` },
-      });
+       });
       const updatedData = await updatedRes.json();
       setOrder(updatedData);
     } catch (err: any) {

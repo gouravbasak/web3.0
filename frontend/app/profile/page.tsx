@@ -132,9 +132,9 @@ function ProfileContent() {
 
     const fetchMe = async () => {
       try {
-        const res = await fetch(`${API}/api/auth/me`, {
+        const res = await fetch(`${API}/api/auth/me`, { credentials: "include", 
           headers: { Authorization: `Bearer ${token}` },
-        });
+         });
 
         if (res.status === 401) {
           localStorage.removeItem("token");
@@ -183,9 +183,9 @@ function ProfileContent() {
 
     const fetchOrders = async () => {
       try {
-        const res = await fetch(`${API}/api/orders/my`, {
+        const res = await fetch(`${API}/api/orders/my`, { credentials: "include", 
           headers: { Authorization: `Bearer ${token}` },
-        });
+         });
 
         if (res.status === 401) {
           setOrders([]);
@@ -213,9 +213,9 @@ function ProfileContent() {
       if (!token) return;
 
       setLoadingVouchers(true);
-      fetch(`${API}/api/auth/vouchers`, {
+      fetch(`${API}/api/auth/vouchers`, { credentials: "include", 
         headers: { Authorization: `Bearer ${token}` },
-      })
+       })
         .then((res) => (res.ok ? res.json() : []))
         .then((data) => setVouchers(Array.isArray(data) ? data : []))
         .catch(() => setVouchers([]))
@@ -323,13 +323,13 @@ function ProfileContent() {
 
     setSavingProfile(true);
     try {
-      const res = await fetch(`${API}/api/auth/me`, {
+      const res = await fetch(`${API}/api/auth/me`, { credentials: "include", 
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name, phone: fullPhone, password }),
+        body: JSON.stringify({ name, phone: fullPhone, password  }),
       });
 
       const data = await res.json();

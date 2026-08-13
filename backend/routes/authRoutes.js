@@ -2,10 +2,25 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
 const User = require('../models/User');
 const userAuth = require('../middlewares/userAuth'); // ✅ Import your middleware
 
 const router = express.Router();
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Limit each IP to 10 login/signup requests per window
+  message: { message: 'Too many attempts from this IP, please try again after 15 minutes' }
+});
+
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  maxAge: 60 * 60 * 1000, // 1 hour
+  path: "/"
+};
 
 // helper to generate JWT
 function generateToken(userId) {
@@ -15,7 +30,7 @@ function generateToken(userId) {
 }
 
 // POST /api/auth/signup
-router.post('/signup', async (req, res) => {
+router.post('/signup', authLimiter, async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
@@ -38,7 +53,7 @@ router.post('/signup', async (req, res) => {
         .json({ message: 'Email is already registered' });
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(password, 12);
 
     const user = await User.create({
       name,
@@ -50,9 +65,10 @@ router.post('/signup', async (req, res) => {
 
     const token = generateToken(user._id);
 
+    res.cookie('token', token, COOKIE_OPTIONS);
+
     res.status(201).json({
       message: 'User created successfully',
-      token,
       user: {
         id: user._id,
         name: user.name,
@@ -66,7 +82,7 @@ router.post('/signup', async (req, res) => {
 });
 
 // POST /api/auth/login
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -88,9 +104,10 @@ router.post('/login', async (req, res) => {
 
     const token = generateToken(user._id);
 
+    res.cookie('token', token, COOKIE_OPTIONS);
+
     res.json({
       message: 'Login successful',
-      token,
       user: {
         id: user._id,
         name: user.name,
@@ -255,7 +272,7 @@ router.put("/me", userAuth, async (req, res) => {
       if (password.trim().length < 6) {
         return res.status(400).json({ message: "Password must be at least 6 characters" });
       }
-      user.passwordHash = await bcrypt.hash(password.trim(), 10);
+      user.passwordHash = await bcrypt.hash(password.trim(), 12);
     }
 
     await user.save();
@@ -275,9 +292,16 @@ router.put("/me", userAuth, async (req, res) => {
   }
 });
 
+// POST /api/auth/logout
+router.post('/logout', (req, res) => {
+  res.clearCookie('token', { path: '/' });
+  res.json({ message: 'Logout successful' });
+});
+
 console.log("✅ Auth routes loaded:");
 console.log("   - POST /signup");
 console.log("   - POST /login");
+console.log("   - POST /logout");
 console.log("   - GET /vouchers");
 console.log("   - GET /me");
 console.log("   - PUT /me");

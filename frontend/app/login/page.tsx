@@ -32,10 +32,10 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API}/api/auth/login`, {
+      const res = await fetch(`${API}/api/auth/login`, { credentials: "include", 
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password  }),
       });
 
       const data = await res.json().catch(() => ({}));
@@ -43,7 +43,6 @@ export default function LoginPage() {
       if (res.ok) {
         toast.success("Welcome back!");
 
-        if (data.token) localStorage.setItem("token", data.token);
         if (data.user) localStorage.setItem("user", JSON.stringify(data.user));
 
         if (typeof window !== "undefined") {

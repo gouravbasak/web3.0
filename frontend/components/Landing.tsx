@@ -45,10 +45,10 @@ export default function UniversalLanding() {
     async function fetchAds() {
       try {
         // 1. Check for admin-selected ad products (isFeatured: true)
-        let res = await fetch(`${API}/api/products/featured`, { cache: "no-store" });
+        let res = await fetch(`${API}/api/products/featured`, { credentials: "include",  cache: "no-store"  });
         
         if (!res.ok) {
-          res = await fetch(`${API}/api/products?isFeatured=true`, { cache: "no-store" });
+          res = await fetch(`${API}/api/products?isFeatured=true`, { credentials: "include",  cache: "no-store"  });
         }
 
         if (res.ok) {
@@ -65,7 +65,7 @@ export default function UniversalLanding() {
 
         // 2. FALLBACK: If NO products are selected as Ads by admin, show ONLY the Top Selling Product
         setHasAdminSelectedAds(false);
-        const topSellingRes = await fetch(`${API}/api/products/best-sellers`, { cache: "no-store" });
+        const topSellingRes = await fetch(`${API}/api/products/best-sellers`, { credentials: "include",  cache: "no-store"  });
         if (topSellingRes.ok) {
           const bestSellers = await topSellingRes.json();
           if (Array.isArray(bestSellers) && bestSellers.length > 0) {
@@ -75,7 +75,7 @@ export default function UniversalLanding() {
         }
 
         // 3. Ultimate Fallback: Single most recent product
-        const fallbackRes = await fetch(`${API}/api/products`, { cache: "no-store" });
+        const fallbackRes = await fetch(`${API}/api/products`, { credentials: "include",  cache: "no-store"  });
         if (fallbackRes.ok) {
           const fallbackData = await fallbackRes.json();
           if (Array.isArray(fallbackData) && fallbackData.length > 0) {

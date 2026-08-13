@@ -40,8 +40,7 @@ async function getProduct(id: string): Promise<Product | null> {
   try {
     const api = getApiBaseUrl();
     const res = await fetch(
-      `${api}/api/products/${id}`,
-      { cache: "no-store" }
+      `${api}/api/products/${id}`, { credentials: "include",  cache: "no-store" }
     );
 
     if (!res.ok) return null;
@@ -73,7 +72,7 @@ export default async function ProductPage({
   params,
 }: {
   params: Promise<{ id: string }>;
-}) {
+ }) {
   const { id } = await params;
   const product = await getProduct(id);
 

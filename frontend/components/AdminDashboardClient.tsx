@@ -83,12 +83,12 @@ export default function AdminDashboardClient() {
     setIsRefreshing(true);
     try {
       const [p, o] = await Promise.all([
-        fetch(`${API}/api/products`, {
+        fetch(`${API}/api/products`, { credentials: "include", 
           headers: getAdminAuthHeaders(),
-        }).then((r) => r.json()),
-        fetch(`${API}/api/orders`, {
+         }).then((r) => r.json()),
+        fetch(`${API}/api/orders`, { credentials: "include", 
           headers: getAdminAuthHeaders(),
-        }).then((r) => r.json()),
+         }).then((r) => r.json()),
       ]);
       setProducts(Array.isArray(p) ? p : []);
       setOrders(Array.isArray(o) ? o : []);

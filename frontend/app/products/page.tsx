@@ -108,9 +108,9 @@ function EnterpriseProductListContent() {
   useEffect(() => {
     async function fetchAds() {
       try {
-        let res = await fetch(`${API}/api/products/featured`, { cache: "no-store" });
+        let res = await fetch(`${API}/api/products/featured`, { credentials: "include",  cache: "no-store"  });
         if (!res.ok) {
-          res = await fetch(`${API}/api/products?isFeatured=true`, { cache: "no-store" });
+          res = await fetch(`${API}/api/products?isFeatured=true`, { credentials: "include",  cache: "no-store"  });
         }
 
         if (res.ok) {
@@ -127,7 +127,7 @@ function EnterpriseProductListContent() {
 
         // Fallback if no admin ads: Top selling product
         setHasAdminSelectedAds(false);
-        const topSellingRes = await fetch(`${API}/api/products/best-sellers`, { cache: "no-store" });
+        const topSellingRes = await fetch(`${API}/api/products/best-sellers`, { credentials: "include",  cache: "no-store"  });
         if (topSellingRes.ok) {
           const bestSellers = await topSellingRes.json();
           if (Array.isArray(bestSellers) && bestSellers.length > 0) {
@@ -136,7 +136,7 @@ function EnterpriseProductListContent() {
           }
         }
 
-        const fallbackRes = await fetch(`${API}/api/products`, { cache: "no-store" });
+        const fallbackRes = await fetch(`${API}/api/products`, { credentials: "include",  cache: "no-store"  });
         if (fallbackRes.ok) {
           const fallbackData = await fallbackRes.json();
           if (Array.isArray(fallbackData) && fallbackData.length > 0) {
