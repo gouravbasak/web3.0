@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const ImageKit = require('imagekit');
@@ -12,6 +13,7 @@ const upload = multer({
 });
 
 function getImageKitInstance() {
+  require('dotenv').config(); // ensure env vars are fresh
   const publicKey = (process.env.IMAGEKIT_PUBLIC_KEY || '').trim();
   const privateKey = (process.env.IMAGEKIT_PRIVATE_KEY || '').trim();
   const urlEndpoint = (process.env.IMAGEKIT_URL_ENDPOINT || '').trim();
