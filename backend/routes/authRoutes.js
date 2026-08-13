@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
 const User = require('../models/User');
+const Otp = require('../models/Otp');
+const { sendLoginOtpEmail } = require('../utils/sendEmail');
 const userAuth = require('../middlewares/userAuth'); // ✅ Import your middleware
 
 const router = express.Router();
@@ -118,6 +120,115 @@ router.post('/login', authLimiter, async (req, res) => {
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+/* =====================================================
+   EMAIL OTP LOGIN ROUTES
+===================================================== */
+
+const otpSendLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Max 5 OTP requests per IP per 15 minutes
+  message: { message: 'Too many OTP requests from this IP. Please try again after 15 minutes.' }
+});
+
+const otpVerifyLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Max 10 verification attempts per IP per 15 minutes
+  message: { message: 'Too many OTP verification attempts. Please try again after 15 minutes.' }
+});
+
+// POST /api/auth/send-login-otp
+router.post('/send-login-otp', otpSendLimiter, async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Email address is required' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: cleanEmail });
+
+    if (!user) {
+      return res.status(404).json({ message: 'No account found with this email address. Please sign up first.' });
+    }
+
+    // 60-second cooldown check to prevent email flooding
+    const recentOtp = await Otp.findOne({
+      email: cleanEmail,
+      createdAt: { $gt: new Date(Date.now() - 60 * 1000) } // Sent within last 60 seconds
+    });
+
+    if (recentOtp) {
+      return res.status(429).json({ message: 'Please wait 60 seconds before requesting another OTP.' });
+    }
+
+    // Generate 6-digit OTP
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Clear previous OTPs for this email and save new OTP
+    await Otp.deleteMany({ email: cleanEmail });
+    await Otp.create({ email: cleanEmail, otp: otpCode });
+
+    // Send email
+    await sendLoginOtpEmail({
+      to: cleanEmail,
+      name: user.name,
+      otp: otpCode,
+    });
+
+    res.json({ message: 'A 6-digit OTP has been sent to your email address.' });
+  } catch (err) {
+    console.error('Send OTP error:', err);
+    res.status(500).json({ message: 'Failed to send OTP. Please try again.' });
+  }
+});
+
+// POST /api/auth/verify-login-otp
+router.post('/verify-login-otp', otpVerifyLimiter, async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ message: 'Email and OTP are required' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    const cleanOtp = otp.toString().trim();
+
+    // Verify OTP record
+    const otpRecord = await Otp.findOne({ email: cleanEmail, otp: cleanOtp });
+    if (!otpRecord) {
+      return res.status(400).json({ message: 'Invalid or expired OTP passcode. Please try again.' });
+    }
+
+    // Delete used OTP
+    await Otp.deleteMany({ email: cleanEmail });
+
+    // Fetch user
+    const user = await User.findOne({ email: cleanEmail });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Issue token
+    const token = generateToken(user._id);
+    res.cookie('token', token, COOKIE_OPTIONS);
+
+    res.json({
+      message: 'Login successful',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone || '',
+      },
+    });
+  } catch (err) {
+    console.error('Verify OTP error:', err);
+    res.status(500).json({ message: 'Failed to verify OTP. Please try again.' });
   }
 });
 
@@ -301,6 +412,8 @@ router.post('/logout', (req, res) => {
 console.log("✅ Auth routes loaded:");
 console.log("   - POST /signup");
 console.log("   - POST /login");
+console.log("   - POST /send-login-otp");
+console.log("   - POST /verify-login-otp");
 console.log("   - POST /logout");
 console.log("   - GET /vouchers");
 console.log("   - GET /me");

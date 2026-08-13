@@ -144,10 +144,42 @@ async function sendAdminOtpEmail({ to, name, otp }) {
   });
 }
 
+/* ================= LOGIN OTP EMAIL ================= */
+
+async function sendLoginOtpEmail({ to, name, otp }) {
+  const html = baseTemplate({
+    title: "Login Verification Passcode",
+    badge: "● SECURE VERIFICATION CODE",
+    content: `
+      <p>Hi <strong style="color:#ffffff;">${name || "Valued Customer"}</strong>,</p>
+
+      <p>Your one-time passcode to log in to your <strong>IONYX Account</strong> is:</p>
+
+      <!-- 6-DIGIT OTP HERO BOX -->
+      <div style="background: linear-gradient(135deg, #090d16 0%, #064e3b 100%); color:#34d399; font-size:36px; font-weight:900; letter-spacing:12px; text-align:center; padding:22px; border-radius:18px; margin:24px 0; border:1px solid #34d399; box-shadow:0 10px 30px rgba(52, 211, 153, 0.2);">
+        ${otp}
+      </div>
+
+      <p style="font-size:13px; color:#94a3b8; text-align:center;">
+        This code is valid for <strong>10 minutes</strong>. Do not share this passcode with anyone.
+      </p>
+    `,
+  });
+
+  await getTransporter().sendMail({
+    from: `"IONYX Security" <${process.env.EMAIL_USER}>`,
+    to,
+    subject: `Your Login Passcode • ${otp}`,
+    html,
+  });
+}
+
 /* ================= EXPORTS ================= */
 
 module.exports = {
   sendOrderCreatedEmail,
   sendOrderCancelledEmail,
   sendAdminOtpEmail,
+  sendLoginOtpEmail,
 };
+
