@@ -7,6 +7,7 @@ import AppShell from "@/components/appShell";
 import { CartProvider } from "../app/context/CartContext";
 import { Toaster } from "react-hot-toast";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 
 const geistSans = Geist({
@@ -119,6 +120,7 @@ export default function RootLayout({
         <CartProvider>
           <AppShell>{children}</AppShell>
           <Analytics />
+          <SpeedInsights />
         </CartProvider>
       </body>
     </html>

@@ -22,6 +22,7 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "@tabler/icons-react": "^3.36.1",
     "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "chart.js": "^4.5.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
