@@ -35,61 +35,16 @@ type AdProduct = {
   reviewCount?: number;
 };
 
-export default function UniversalLanding() {
-  const [ads, setAds] = useState<AdProduct[]>([]);
+export default function UniversalLanding({ initialAds = [], initialHasAdminSelected = false }: { initialAds?: AdProduct[], initialHasAdminSelected?: boolean }) {
+  const [ads, setAds] = useState<AdProduct[]>(initialAds);
   const [activeAdIndex, setActiveAdIndex] = useState(0);
-  const [loadingAds, setLoadingAds] = useState(true);
-  const [hasAdminSelectedAds, setHasAdminSelectedAds] = useState(false);
+  const [hasAdminSelectedAds, setHasAdminSelectedAds] = useState(initialHasAdminSelected);
 
+  // If props change (e.g. client side navigation), update state
   useEffect(() => {
-    async function fetchAds() {
-      try {
-        // 1. Check for admin-selected ad products (isFeatured: true)
-        let res = await fetch(`${API}/api/products/featured`, { credentials: "include",  cache: "no-store"  });
-        
-        if (!res.ok) {
-          res = await fetch(`${API}/api/products?isFeatured=true`, { credentials: "include",  cache: "no-store"  });
-        }
-
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data)) {
-            const featuredList = data.filter((p: any) => p.isFeatured);
-            if (featuredList.length > 0) {
-              setAds(featuredList);
-              setHasAdminSelectedAds(true);
-              return;
-            }
-          }
-        }
-
-        // 2. FALLBACK: If NO products are selected as Ads by admin, show ONLY the Top Selling Product
-        setHasAdminSelectedAds(false);
-        const topSellingRes = await fetch(`${API}/api/products/best-sellers`, { credentials: "include",  cache: "no-store"  });
-        if (topSellingRes.ok) {
-          const bestSellers = await topSellingRes.json();
-          if (Array.isArray(bestSellers) && bestSellers.length > 0) {
-            setAds([bestSellers[0]]);
-            return;
-          }
-        }
-
-        // 3. Ultimate Fallback: Single most recent product
-        const fallbackRes = await fetch(`${API}/api/products`, { credentials: "include",  cache: "no-store"  });
-        if (fallbackRes.ok) {
-          const fallbackData = await fallbackRes.json();
-          if (Array.isArray(fallbackData) && fallbackData.length > 0) {
-            setAds([fallbackData[0]]);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to load ad products:", err);
-      } finally {
-        setLoadingAds(false);
-      }
-    }
-    fetchAds();
-  }, []);
+    setAds(initialAds);
+    setHasAdminSelectedAds(initialHasAdminSelected);
+  }, [initialAds, initialHasAdminSelected]);
 
 
 
@@ -189,11 +144,7 @@ export default function UniversalLanding() {
                 {/* Main Editorial Card Container */}
                 <div className="relative bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800/80 rounded-3xl p-6 shadow-xl dark:shadow-2xl overflow-hidden transition-all duration-300 min-h-[440px]">
                   
-                  {loadingAds ? (
-                    <div className="h-[400px] flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500" />
-                    </div>
-                  ) : ads.length > 0 ? (
+                  {ads.length > 0 ? (
                     (() => {
                       const currentAd = ads[activeAdIndex];
                       const discount = currentAd.mrp && currentAd.mrp > currentAd.price
