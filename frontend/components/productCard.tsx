@@ -5,16 +5,19 @@ import Link from "next/link";
 import AddToCartButton from "./AddToCartButton";
 import { Badge } from "@/components/ui/badge";
 import { BadgeCheck, Heart, Star, Sparkles } from "lucide-react";
+import { getValidImageUrl } from "@/lib/getImageUrl";
 
 export default function ProductCard({ product }: any) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const outOfStock = typeof product.stock === "number" && product.stock <= 0;
   const isLowStock = typeof product.stock === "number" && product.stock > 0 && product.stock <= 5;
 
-  const primaryImage =
+  const rawImage =
     Array.isArray(product.images) && product.images.length > 0
       ? product.images[0]
-      : "/placeholder.png";
+      : "";
+
+  const primaryImage = getValidImageUrl(rawImage, product.category);
 
   const isNewLaunch = (createdAt?: string) => {
     if (!createdAt) return false;

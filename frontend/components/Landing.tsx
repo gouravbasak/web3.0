@@ -19,6 +19,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import { getApiBaseUrl } from "@/lib/apiBase";
+import { getValidImageUrl } from "@/lib/getImageUrl";
 
 const API = getApiBaseUrl();
 
@@ -173,7 +174,7 @@ export default function UniversalLanding({ initialAds = [], initialHasAdminSelec
                           {/* Image Container with Fixed Bounds */}
                           <div className="w-full h-60 rounded-2xl overflow-hidden mb-4 relative bg-slate-100 dark:bg-zinc-950 flex items-center justify-center p-4">
                             <img
-                              src={currentAd.images?.[0] || "/placeholder.png"}
+                              src={getValidImageUrl(currentAd.images?.[0], currentAd.category)}
                               alt={currentAd.title}
                               className="w-full h-full object-contain p-2 transform group-hover:scale-105 transition-transform duration-700 ease-out"
                             />

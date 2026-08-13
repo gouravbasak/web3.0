@@ -47,11 +47,16 @@ app.use(express.json());
 app.use('/api/reviews', reviewRoutes);
 /* ================= ROUTES ================= */
 
+const uploadRoutes = require("./routes/uploadRoutes");
+
 // Admin authentication (login, logout, me)
 app.use("/api/admin", adminAuthRoutes);
 
 // User authentication
 app.use("/api/auth", authRoutes);
+
+// Admin image upload (ImageKit)
+app.use("/api/admin/upload", uploadRoutes);
 
 // Orders (create, list, update)
 app.use("/api/orders", orderRoutes);
