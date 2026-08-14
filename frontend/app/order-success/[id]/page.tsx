@@ -27,6 +27,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { getApiBaseUrl } from "@/lib/apiBase";
+import jsPDF from "jspdf";
 
 const API = getApiBaseUrl();
 
