@@ -6,6 +6,10 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Eye, EyeOff, Mail, Lock, User, CheckCircle2, X } from "lucide-react";
 
+import { getApiBaseUrl } from "@/lib/apiBase";
+
+const API = getApiBaseUrl();
+
 export default function SignupPage() {
   const router = useRouter();
 
@@ -34,23 +38,28 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:4000/api/auth/signup", { credentials: "include", 
+      const res = await fetch(`${API}/api/auth/signup`, {
+        credentials: "include",
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password  }),
+        body: JSON.stringify({ name, email, password }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
       if (res.ok) {
         toast.success("Welcome! Account created successfully!");
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
+        if (data.token) localStorage.setItem("token", data.token);
+        if (data.user) localStorage.setItem("user", JSON.stringify(data.user));
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("auth-change"));
+        }
         router.push("/");
       } else {
         toast.error(data.message || "Sign up failed");
       }
     } catch (error) {
+      console.error("Signup error:", error);
       toast.error("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);

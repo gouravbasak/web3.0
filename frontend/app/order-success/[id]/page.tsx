@@ -26,9 +26,9 @@ import {
   ArrowLeft,
   AlertCircle
 } from "lucide-react";
-import jsPDF from "jspdf";
+import { getApiBaseUrl } from "@/lib/apiBase";
 
-const API = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+const API = getApiBaseUrl();
 
 type OrderItem = {
   productId: string;

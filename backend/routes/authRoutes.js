@@ -71,6 +71,7 @@ router.post('/signup', authLimiter, async (req, res) => {
 
     res.status(201).json({
       message: 'User created successfully',
+      token,
       user: {
         id: user._id,
         name: user.name,
