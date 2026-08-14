@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Eye, EyeOff, Mail, Lock, KeyRound, ArrowRight, Shield, Zap, Sparkles, RefreshCw } from "lucide-react";
 import { getApiBaseUrl } from "@/lib/apiBase";
+import GoogleSignInButton from "@/components/GoogleSignInButton";
 
 const API = getApiBaseUrl();
 
@@ -198,6 +199,18 @@ export default function LoginPage() {
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Sign In</h2>
                 <p className="text-sm text-muted-foreground mt-1">Choose your preferred login method</p>
+              </div>
+
+              {/* GOOGLE SIGN IN BUTTON */}
+              <GoogleSignInButton />
+
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-200 dark:border-slate-800" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white dark:bg-slate-900 px-2 text-slate-400">or continue with</span>
+                </div>
               </div>
 
               {/* TAB SWITCHER */}

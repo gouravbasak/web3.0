@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { Eye, EyeOff, Mail, Lock, User, CheckCircle2, X } from "lucide-react";
 
 import { getApiBaseUrl } from "@/lib/apiBase";
+import GoogleSignInButton from "@/components/GoogleSignInButton";
 
 const API = getApiBaseUrl();
 
@@ -266,6 +267,17 @@ export default function SignupPage() {
               <p className="text-gray-500 dark:text-gray-400 text-sm">
                 Join us and start your shopping journey
               </p>
+            </div>
+
+            <GoogleSignInButton />
+
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200 dark:border-gray-800" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white dark:bg-gray-900 px-2 text-gray-400">or sign up with email</span>
+              </div>
             </div>
 
             <form onSubmit={handleSignup} className="space-y-5">

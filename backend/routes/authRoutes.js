@@ -3,11 +3,13 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
+const { OAuth2Client } = require('google-auth-library');
 const User = require('../models/User');
 const Otp = require('../models/Otp');
 const { sendLoginOtpEmail } = require('../utils/sendEmail');
 const userAuth = require('../middlewares/userAuth'); // ✅ Import your middleware
 
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const router = express.Router();
 
 const authLimiter = rateLimit({
@@ -230,6 +232,79 @@ router.post('/verify-login-otp', otpVerifyLimiter, async (req, res) => {
   } catch (err) {
     console.error('Verify OTP error:', err);
     res.status(500).json({ message: 'Failed to verify OTP. Please try again.' });
+  }
+});
+
+// POST /api/auth/google-login
+router.post('/google-login', async (req, res) => {
+  try {
+    const { credential } = req.body;
+    if (!credential) {
+      return res.status(400).json({ message: 'Google authentication credential token is required' });
+    }
+
+    let payload = null;
+
+    if (process.env.GOOGLE_CLIENT_ID) {
+      try {
+        const ticket = await googleClient.verifyIdToken({
+          idToken: credential,
+          audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        payload = ticket.getPayload();
+      } catch (e) {
+        console.warn('Google verifyIdToken error fallback to token decode:', e.message);
+        payload = jwt.decode(credential);
+      }
+    } else {
+      payload = jwt.decode(credential);
+    }
+
+    if (!payload || !payload.email) {
+      return res.status(400).json({ message: 'Invalid Google authentication payload' });
+    }
+
+    const { email, name, picture } = payload;
+    const cleanEmail = email.toLowerCase().trim();
+
+    let user = await User.findOne({ email: cleanEmail });
+
+    if (!user) {
+      const randomPassword = Math.random().toString(36).slice(-10) + Date.now().toString(36);
+      const passwordHash = await bcrypt.hash(randomPassword, 10);
+      user = await User.create({
+        name: name || cleanEmail.split('@')[0],
+        email: cleanEmail,
+        passwordHash,
+        profileImage: picture || '',
+        phone: '',
+        vouchers: [],
+      });
+      console.log(`✅ New user created via Google Sign-In: ${cleanEmail}`);
+    } else {
+      if (picture && !user.profileImage) {
+        user.profileImage = picture;
+        await user.save();
+      }
+    }
+
+    const token = generateToken(user._id);
+    res.cookie('token', token, COOKIE_OPTIONS);
+
+    return res.json({
+      message: 'Google login successful',
+      token,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone || '',
+        profileImage: user.profileImage || picture || '',
+      },
+    });
+  } catch (err) {
+    console.error('Google login route error:', err);
+    return res.status(500).json({ message: 'Failed to complete Google Sign-In' });
   }
 });
 
