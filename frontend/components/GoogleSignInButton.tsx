@@ -46,7 +46,7 @@ export default function GoogleSignInButton() {
         window.google.accounts.id.renderButton(btnContainer, {
           theme: "outline",
           size: "large",
-          width: "100%",
+          width: 380,
           text: "continue_with",
           shape: "pill",
         });
