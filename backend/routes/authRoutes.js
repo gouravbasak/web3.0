@@ -485,19 +485,94 @@ router.put("/me", userAuth, async (req, res) => {
   }
 });
 
+/* =====================================================
+   WISHLIST ROUTES (PERSISTENT CROSS-DEVICE)
+===================================================== */
+// GET /api/auth/wishlist
+router.get("/wishlist", userAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate("wishlist");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({ wishlist: user.wishlist || [] });
+  } catch (err) {
+    console.error("Error fetching wishlist:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// POST /api/auth/wishlist/toggle
+router.post("/wishlist/toggle", userAuth, async (req, res) => {
+  try {
+    const { productId } = req.body;
+    if (!productId) {
+      return res.status(400).json({ message: "Product ID is required" });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.wishlist) user.wishlist = [];
+
+    const index = user.wishlist.findIndex((id) => id.toString() === productId.toString());
+    let added = false;
+
+    if (index > -1) {
+      user.wishlist.splice(index, 1);
+    } else {
+      user.wishlist.push(productId);
+      added = true;
+    }
+
+    await user.save();
+
+    res.json({
+      success: true,
+      inWishlist: added,
+      wishlist: user.wishlist,
+    });
+  } catch (err) {
+    console.error("Error toggling wishlist:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// POST /api/auth/wishlist/sync
+router.post("/wishlist/sync", userAuth, async (req, res) => {
+  try {
+    const { productIds } = req.body;
+    if (!Array.isArray(productIds)) {
+      return res.status(400).json({ message: "productIds must be an array" });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (!user.wishlist) user.wishlist = [];
+
+    const currentIds = user.wishlist.map((id) => id.toString());
+    for (const pid of productIds) {
+      if (pid && !currentIds.includes(pid.toString())) {
+        user.wishlist.push(pid);
+        currentIds.push(pid.toString());
+      }
+    }
+
+    await user.save();
+    res.json({ success: true, wishlist: user.wishlist });
+  } catch (err) {
+    console.error("Error syncing wishlist:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // POST /api/auth/logout
 router.post('/logout', (req, res) => {
   res.clearCookie('token', { path: '/' });
   res.json({ message: 'Logout successful' });
 });
 
-console.log("✅ Auth routes loaded:");
-console.log("   - POST /signup");
-console.log("   - POST /login");
-console.log("   - POST /send-login-otp");
-console.log("   - POST /verify-login-otp");
-console.log("   - POST /logout");
-console.log("   - GET /vouchers");
-console.log("   - GET /me");
-console.log("   - PUT /me");
 module.exports = router;

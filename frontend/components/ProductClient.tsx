@@ -1,13 +1,14 @@
 // components/ProductClient.tsx
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import AddToCartButton from "./AddToCartButton";
 import BuyNowButton from "./BuyNowButton";
 import ProductPurchaseOptions from "./ProductPurchaseOptions";
 import PincodeDeliveryEstimator from "./PincodeDeliveryEstimator";
-import { BadgeCheck, Star, Flame, CheckCircle2, ShieldCheck, Zap, PackageCheck } from "lucide-react";
+import { BadgeCheck, Star, Flame, CheckCircle2, ShieldCheck, Zap, PackageCheck, Heart } from "lucide-react";
 import { useCurrency } from "@/app/context/CurrencyContext";
+import { useWishlist } from "@/app/context/WishlistContext";
 
 type Product = {
   _id: string;
@@ -43,6 +44,7 @@ type Product = {
     _id: string | { $oid: string };
     createdAt: string | { $date: string };
   }>;
+  images?: string[];
 };
 
 type Props = {
@@ -52,10 +54,39 @@ type Props = {
 
 export default function ProductClient({ product, images }: Props) {
   const { formatPrice } = useCurrency();
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const isWishlisted = isInWishlist(product._id);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [quantity, setQuantity] = useState(1);
   const [currentPrice, setCurrentPrice] = useState(product.price);
   const [currentSku, setCurrentSku] = useState<string>("");
+
+  // Record into recently viewed history
+  useEffect(() => {
+    if (!product || !product._id) return;
+    try {
+      const KEY = "ionyx_recent_products";
+      const stored = localStorage.getItem(KEY);
+      let items: any[] = stored ? JSON.parse(stored) : [];
+      if (!Array.isArray(items)) items = [];
+
+      items = items.filter((item) => item._id !== product._id);
+      items.unshift({
+        _id: product._id,
+        title: product.title,
+        price: product.price,
+        mrp: product.mrp,
+        image: (images && images[0]) || (Array.isArray(product.images) && product.images[0]) || "",
+        category: product.category,
+        brand: product.brand,
+        viewedAt: Date.now(),
+      });
+
+      items = items.slice(0, 10);
+      localStorage.setItem(KEY, JSON.stringify(items));
+      window.dispatchEvent(new Event("recent-products-updated"));
+    } catch (_) {}
+  }, [product._id, product.title, product.price, product.mrp, product.category, product.brand, images]);
 
   const discountPercent = useMemo(() => {
     if (!product.mrp || product.mrp <= currentPrice) return 0;
@@ -172,8 +203,8 @@ export default function ProductClient({ product, images }: Props) {
         onChange={handlePurchaseOptionsChange}
       />
 
-      {/* DUAL ACTION BUTTONS */}
-      <div className="flex flex-col sm:flex-row gap-3 pt-2">
+      {/* DUAL ACTION BUTTONS & WISHLIST */}
+      <div className="flex items-center gap-3 pt-2">
         <AddToCartButton
           productId={product._id}
           title={product.title}
@@ -198,6 +229,22 @@ export default function ProductClient({ product, images }: Props) {
           sku={currentSku}
           className="flex-1 text-sm font-black py-4 rounded-2xl shadow-lg"
         />
+        <button
+          onClick={() => toggleWishlist(product._id, product.title)}
+          className={`h-[52px] w-[52px] shrink-0 rounded-2xl border transition-all duration-300 shadow-md flex items-center justify-center group ${
+            isWishlisted
+              ? "bg-red-50 dark:bg-red-950/30 border-red-300 dark:border-red-800/60 text-red-500"
+              : "bg-white dark:bg-zinc-800/90 border-slate-200 dark:border-zinc-700/80 text-slate-600 dark:text-zinc-300 hover:text-red-500 hover:border-red-200 dark:hover:border-red-900/50"
+          }`}
+          title={isWishlisted ? "Remove from Wishlist" : "Save to Wishlist"}
+          aria-label="Toggle Wishlist"
+        >
+          <Heart
+            className={`h-5 w-5 transition-transform duration-300 group-hover:scale-110 active:scale-95 ${
+              isWishlisted ? "fill-red-500 text-red-500" : ""
+            }`}
+          />
+        </button>
       </div>
 
       {/* 6-DIGIT INDIAN PINCODE DELIVERY ESTIMATOR */}

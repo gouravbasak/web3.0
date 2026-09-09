@@ -35,6 +35,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "v1.0",
     },
+    wishlist: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
+    }],
      
   vouchers: [{
     code: String,

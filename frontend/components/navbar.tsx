@@ -4,6 +4,8 @@ import { useState, useEffect, FormEvent } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useCart } from "../app/context/CartContext";
+import { useWishlist } from "../app/context/WishlistContext";
+import { Heart } from "lucide-react";
 import { useDarkMode } from "@/lib/useDarkMode";
 import { API_BASE } from "@/lib/apiBase";
 
@@ -21,6 +23,7 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const { cart } = useCart();
+  const { wishlistCount } = useWishlist();
   const { isDark, toggle } = useDarkMode();
 
   const productCount = cart.reduce((sum, item) => sum + item.qty, 0);
@@ -210,6 +213,21 @@ export default function Navbar() {
             </button>
           )}
 
+          {/* WISHLIST */}
+          <button
+            onClick={() => router.push("/wishlist")}
+            className="relative h-11 w-11 rounded-full bg-card/50 backdrop-blur-sm border border-border/50 flex items-center justify-center hover:bg-accent/50 transition-all duration-300 hover:scale-110 active:scale-95 group"
+            aria-label="Wishlist"
+            title="Wishlist"
+          >
+            <Heart className={`w-4 h-4 transition-colors ${wishlistCount > 0 ? "text-red-500 fill-red-500/20" : "text-foreground/70 group-hover:text-red-500"}`} />
+            {wishlistCount > 0 && (
+              <span className="absolute -top-1 -right-1 h-5 min-w-[20px] rounded-full bg-red-600 text-white text-[10px] font-bold flex items-center justify-center px-1 shadow-sm">
+                {wishlistCount > 9 ? "9+" : wishlistCount}
+              </span>
+            )}
+          </button>
+
           {/* CART */}
           <button
             onClick={() => router.push("/cart")}
@@ -272,6 +290,26 @@ export default function Navbar() {
               onClick={() => setMobileMenuOpen(false)}
             >
               <span className="text-sm">All Products</span>
+            </Link>
+
+            <Link 
+              href="/wishlist" 
+              className={`flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-300 ${
+                pathname === "/wishlist" 
+                  ? "bg-foreground text-background font-medium" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+              }`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <div className="flex items-center gap-3">
+                <Heart className="w-4 h-4 text-red-500" />
+                <span className="text-sm">Wishlist</span>
+              </div>
+              {wishlistCount > 0 && (
+                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-red-500/20 text-red-500">
+                  {wishlistCount}
+                </span>
+              )}
             </Link>
             
             {!isLoggedIn && (

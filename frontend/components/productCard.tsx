@@ -7,10 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { BadgeCheck, Heart, Star, Sparkles } from "lucide-react";
 import { getValidImageUrl } from "@/lib/getImageUrl";
 import { useCurrency } from "@/app/context/CurrencyContext";
+import { useWishlist } from "@/app/context/WishlistContext";
 
 export default function ProductCard({ product }: any) {
   const { formatPrice } = useCurrency();
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const isWishlisted = isInWishlist(product._id);
   const outOfStock = typeof product.stock === "number" && product.stock <= 0;
   const isLowStock = typeof product.stock === "number" && product.stock > 0 && product.stock <= 5;
 
@@ -88,7 +90,11 @@ export default function ProductCard({ product }: any) {
 
           {/* WISHLIST HEART BUTTON */}
           <button
-            onClick={() => setIsWishlisted(!isWishlisted)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleWishlist(product._id, product.title);
+            }}
             className="absolute top-2.5 right-2.5 p-2 rounded-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200/50 dark:border-zinc-700/50 text-gray-700 dark:text-zinc-300 hover:text-red-500 dark:hover:text-red-500 transition shadow-sm z-10"
             aria-label="Add to wishlist"
           >

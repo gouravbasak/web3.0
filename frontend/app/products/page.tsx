@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { getApiBaseUrl } from "@/lib/apiBase";
 import Link from "next/link";
 import AddToCartButton from "@/components/AddToCartButton";
+import { useWishlist } from "@/app/context/WishlistContext";
 import {
   Search,
   Grid3X3,
@@ -92,7 +93,7 @@ function EnterpriseProductListContent() {
   const [viewMode, setViewMode] = useState<"grid4" | "grid3" | "list">("grid4");
 
   // Enterprise Interactive States
-  const [wishlist, setWishlist] = useState<Record<string, boolean>>({});
+  const { isInWishlist, toggleWishlist } = useWishlist();
   const [compareItems, setCompareItems] = useState<Product[]>([]);
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [hoveredProductImage, setHoveredProductImage] = useState<Record<string, number>>({});
@@ -275,11 +276,6 @@ function EnterpriseProductListContent() {
 
     return list;
   }, [products, searchQuery, selectedCategory, selectedBrand, pricePreset, inStockOnly, sortBy]);
-
-  // Wishlist Toggle
-  const toggleWishlist = (id: string) => {
-    setWishlist((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
 
   // Compare Toggle
   const toggleCompare = (product: Product) => {
@@ -782,7 +778,7 @@ function EnterpriseProductListContent() {
             }`}
           >
             {filteredProducts.map((p) => {
-              const isWishlisted = !!wishlist[p._id];
+              const isWishlisted = isInWishlist(p._id);
               const isComparing = compareItems.some((item) => item._id === p._id);
               const discountPercent =
                 p.mrp && p.mrp > p.price
@@ -823,7 +819,7 @@ function EnterpriseProductListContent() {
                       <div className="absolute top-3 right-3 flex flex-col gap-1.5 z-10">
                         {/* WISHLIST BUTTON */}
                         <button
-                          onClick={() => toggleWishlist(p._id)}
+                          onClick={() => toggleWishlist(p._id, p.title)}
                           className="p-2 rounded-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200/50 dark:border-zinc-700/50 text-gray-700 dark:text-zinc-300 hover:text-red-500 transition shadow-md"
                           aria-label="Wishlist"
                         >

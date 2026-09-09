@@ -5,6 +5,7 @@ import ProductImageGallery from "../../../components/ProductImageGallery";
 import ProductClient from "@/components/ProductClient";
 import ProductCard from "@/components/productCard"; 
 import ProductReviewsCarousel from "@/components/ProductReviewsCarousel";
+import RecentlyViewedCarousel from "@/components/RecentlyViewedCarousel";
 import { Truck, RotateCcw, Headset, Award, ChevronRight, Home } from "lucide-react";
 import {
   Accordion,
@@ -316,6 +317,9 @@ export default async function ProductPage({
             </div>
           </div>
         )}
+
+        {/* RECENTLY VIEWED CAROUSEL */}
+        <RecentlyViewedCarousel currentId={product._id} />
 
       </div>
     </main>
