@@ -1,5 +1,6 @@
 // app/products/[id]/page.tsx
 import Link from "next/link";
+import type { Metadata } from "next";
 import ProductImageGallery from "../../../components/ProductImageGallery";
 import ProductClient from "@/components/ProductClient";
 import ProductCard from "@/components/productCard"; 
@@ -65,6 +66,62 @@ async function getRelatedProducts(category: string, currentId: string): Promise<
   } catch (err) {
     console.error("Failed to fetch related products:", err);
     return [];
+  }
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  try {
+    const { id } = await params;
+    const product = await getProduct(id);
+    if (!product) {
+      return {
+        title: "Product Not Found | IONYX Store",
+      };
+    }
+
+    const primaryImage =
+      Array.isArray(product.images) && product.images.length > 0
+        ? product.images[0]
+        : "https://shopit-lilac-rho.vercel.app/trolley.png";
+
+    const formattedPrice = `₹${product.price.toLocaleString("en-IN")}`;
+    const cleanDesc =
+      product.description?.replace(/\s+/g, " ").trim().slice(0, 160) ||
+      `Buy ${product.title} online at best price ${formattedPrice} on IONYX Store. Fast shipping & easy returns.`;
+
+    return {
+      title: `${product.title} - ${formattedPrice} | IONYX Store`,
+      description: cleanDesc,
+      openGraph: {
+        title: `${product.title} • ${formattedPrice}`,
+        description: cleanDesc,
+        url: `https://shopit-lilac-rho.vercel.app/products/${id}`,
+        siteName: "IONYX Store",
+        images: [
+          {
+            url: primaryImage,
+            width: 800,
+            height: 800,
+            alt: product.title,
+          },
+        ],
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${product.title} • ${formattedPrice}`,
+        description: cleanDesc,
+        images: [primaryImage],
+      },
+    };
+  } catch {
+    return {
+      title: "IONYX Store - Premium Gear & Tech",
+    };
   }
 }
 

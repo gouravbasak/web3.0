@@ -5,6 +5,7 @@ import { useState, useCallback, useMemo } from "react";
 import AddToCartButton from "./AddToCartButton";
 import BuyNowButton from "./BuyNowButton";
 import ProductPurchaseOptions from "./ProductPurchaseOptions";
+import PincodeDeliveryEstimator from "./PincodeDeliveryEstimator";
 import { BadgeCheck, Star, Flame, CheckCircle2, ShieldCheck, Zap, PackageCheck } from "lucide-react";
 import { useCurrency } from "@/app/context/CurrencyContext";
 
@@ -198,6 +199,9 @@ export default function ProductClient({ product, images }: Props) {
           className="flex-1 text-sm font-black py-4 rounded-2xl shadow-lg"
         />
       </div>
+
+      {/* 6-DIGIT INDIAN PINCODE DELIVERY ESTIMATOR */}
+      <PincodeDeliveryEstimator />
 
       {/* OVERVIEW SUMMARY BIO */}
       <div className="pt-4 border-t border-slate-100 dark:border-zinc-800 space-y-2">

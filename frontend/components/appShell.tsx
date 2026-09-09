@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import Navbar from "@/components/navbar";
 import PromoBar from "@/components/promoBar";
 import Footer from "@/components/footer";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 type Props = {
   children: React.ReactNode;
@@ -38,7 +39,12 @@ export default function AppShell({ children }: Props) {
         </main>
       </div>
 
-      {!hideChrome && <Footer />}
+      {!hideChrome && (
+        <>
+          <WhatsAppButton />
+          <Footer />
+        </>
+      )}
     </div>
   );
 }
