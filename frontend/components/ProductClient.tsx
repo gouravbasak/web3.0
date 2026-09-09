@@ -203,6 +203,21 @@ export default function ProductClient({ product, images }: Props) {
       {/* 6-DIGIT INDIAN PINCODE DELIVERY ESTIMATOR */}
       <PincodeDeliveryEstimator />
 
+      {/* 1-CLICK SHARE ON WHATSAPP */}
+      <a
+        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+          `Check out the ${product.title} on IONYX Store: https://shopit-lilac-rho.vercel.app/products/${product._id}`
+        )}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-emerald-300/80 dark:border-emerald-800/60 bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300 text-xs font-bold hover:bg-emerald-100/70 dark:hover:bg-emerald-900/40 transition shadow-sm"
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-[#25D366]">
+          <path fillRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.98-1.408A9.957 9.957 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm4.99 14.153c-.208.583-1.037 1.077-1.637 1.205-.412.088-.95.158-2.766-.595-2.322-.962-3.818-3.327-3.935-3.48-.112-.158-.94-1.25-.94-2.384 0-1.134.595-1.69.807-1.922.213-.233.465-.291.62-.291.155 0 .31.002.445.01.144.007.337-.055.526.4.195.467.666 1.623.725 1.741.058.118.098.256.02.41-.078.158-.117.256-.233.393-.117.137-.246.306-.352.41-.116.118-.238.246-.102.48.136.233.606 1 .1.299 1.618.89 1.152 1.644 1.508 1.877.233.136.37.118.506-.039.136-.157.583-.68.739-.913.155-.233.31-.194.524-.116.213.078 1.357.64 1.59.756.233.117.388.175.446.272.059.098.059.564-.149 1.147z" clipRule="evenodd" />
+        </svg>
+        <span>Share Product on WhatsApp</span>
+      </a>
+
       {/* OVERVIEW SUMMARY BIO */}
       <div className="pt-4 border-t border-slate-100 dark:border-zinc-800 space-y-2">
         <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Overview</h3>

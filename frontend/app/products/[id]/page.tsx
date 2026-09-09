@@ -89,12 +89,14 @@ export async function generateMetadata({
         : "https://shopit-lilac-rho.vercel.app/trolley.png";
 
     const formattedPrice = `₹${product.price.toLocaleString("en-IN")}`;
+    const rawDesc = product.description?.replace(/\s+/g, " ").trim() || "";
     const cleanDesc =
-      product.description?.replace(/\s+/g, " ").trim().slice(0, 160) ||
-      `Buy ${product.title} online at best price ${formattedPrice} on IONYX Store. Fast shipping & easy returns.`;
+      rawDesc.length > 25
+        ? rawDesc.slice(0, 160)
+        : `${product.title} by ${product.brand || "IONYX"} available at ${formattedPrice}. In stock with fast shipping across India & 7-day returns on IONYX Store.`;
 
     return {
-      title: `${product.title} - ${formattedPrice} | IONYX Store`,
+      title: `${product.title} - ${formattedPrice}`,
       description: cleanDesc,
       openGraph: {
         title: `${product.title} • ${formattedPrice}`,
@@ -104,9 +106,11 @@ export async function generateMetadata({
         images: [
           {
             url: primaryImage,
+            secureUrl: primaryImage,
             width: 800,
             height: 800,
             alt: product.title,
+            type: primaryImage.endsWith(".png") ? "image/png" : "image/webp",
           },
         ],
         type: "website",
