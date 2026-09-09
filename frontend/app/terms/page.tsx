@@ -105,7 +105,7 @@ export default function TermsPage() {
             <div className="text-xs sm:text-sm space-y-1">
               <p><strong>Nodal / Grievance Officer:</strong> Gourav Basak</p>
               <p><strong>Email:</strong> <span className="text-emerald-600 dark:text-emerald-400 font-medium">support@ionyx.com</span></p>
-              <p><strong>Contact Hotline:</strong> +91 8637866948</p>
+              <p><strong>Contact Hotline:</strong> +91 7583998120</p>
               <p><strong>Timelines:</strong> Acknowledgment within 48 hours; resolution within 15–30 days.</p>
             </div>
           </section>

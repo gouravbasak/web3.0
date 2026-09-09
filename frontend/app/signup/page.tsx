@@ -128,7 +128,7 @@ export default function SignupPage() {
           
           <div>
             <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">10. Contact &amp; Grievance Redressal</h3>
-            <p>For any questions or grievances regarding these terms, please contact our Grievance Officer at support@ionyx.com or call +91 8637866948 (Mon–Sat, 10 AM – 6 PM).</p>
+            <p>For any questions or grievances regarding these terms, please contact our Grievance Officer at support@ionyx.com or call +91 7583998120 (Mon–Sat, 10 AM – 6 PM).</p>
           </div>
         </div>
         <div className="p-6 border-t border-gray-200 dark:border-gray-800">
@@ -204,7 +204,7 @@ export default function SignupPage() {
           
           <div>
             <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">10. Grievance Officer Details</h3>
-            <p>In accordance with IT Rules 2021, contact our Nodal Grievance Officer at support@ionyx.com or +91 8637866948. Complaints are acknowledged within 48 hours and resolved within 15–30 days.</p>
+            <p>In accordance with IT Rules 2021, contact our Nodal Grievance Officer at support@ionyx.com or +91 7583998120. Complaints are acknowledged within 48 hours and resolved within 15–30 days.</p>
           </div>
         </div>
         <div className="p-6 border-t border-gray-200 dark:border-gray-800">

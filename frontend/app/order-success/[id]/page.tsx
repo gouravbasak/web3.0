@@ -215,7 +215,7 @@ export default function OrderDetailsPage() {
     pdf.setFontSize(8);
     pdf.setTextColor(100, 116, 139);
     pdf.text("Sold By: IONYX Technologies & Retail • West Bengal, India", pageWidth / 2, 19, { align: "center" });
-    pdf.text("Email: support@ionyx.com • Customer Helpline: +91 8637866948", pageWidth / 2, 23, { align: "center" });
+    pdf.text("Email: support@ionyx.com • Customer Helpline: +91 7583998120", pageWidth / 2, 23, { align: "center" });
 
     pdf.setFontSize(9);
     pdf.setTextColor(0, 0, 0);

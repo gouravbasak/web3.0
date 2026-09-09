@@ -128,7 +128,7 @@ export default function PrivacyPage() {
               </div>
               <div>
                 <p className="font-semibold text-slate-900 dark:text-white">Helpline:</p>
-                <p className="text-slate-600 dark:text-slate-400">+91 8637866948 (Mon–Sat, 10 AM – 6 PM)</p>
+                <p className="text-slate-600 dark:text-slate-400">+91 7583998120 (Mon–Sat, 10 AM – 6 PM)</p>
               </div>
             </div>
             <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">

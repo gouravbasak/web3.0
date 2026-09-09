@@ -4,7 +4,7 @@ import React, { useState } from "react";
 
 export default function WhatsAppButton() {
   const [showTooltip, setShowTooltip] = useState(false);
-  const phoneNumber = "918637866948";
+  const phoneNumber = "917583998120";
   const defaultMessage = encodeURIComponent(
     "Hi IONYX Store! I am browsing your website and have a question about placing an order."
   );
