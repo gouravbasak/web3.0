@@ -36,6 +36,26 @@ const productSchema = new mongoose.Schema({
     required: true,
   },
 
+  countryOfOrigin: {
+    type: String,
+    default: "India",
+  },
+
+  netQuantity: {
+    type: String,
+    default: "1 Unit",
+  },
+
+  manufacturer: {
+    type: String,
+    default: "",
+  },
+
+  hsnCode: {
+    type: String,
+    default: "",
+  },
+
   images: {
     type: [String],
     default: [],

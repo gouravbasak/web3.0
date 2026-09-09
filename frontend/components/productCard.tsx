@@ -149,7 +149,7 @@ export default function ProductCard({ product }: any) {
 
       {/* BOTTOM PRICE & CART BUTTON */}
       <div className="pt-2 border-t border-gray-100 dark:border-zinc-800/80">
-        <div className="flex items-baseline gap-2 mb-3">
+        <div className="flex items-baseline gap-2 mb-1">
           <span className="text-xl font-extrabold text-gray-900 dark:text-white">
             {formatPrice(product.price)}
           </span>
@@ -163,6 +163,9 @@ export default function ProductCard({ product }: any) {
               Only {product.stock} left
             </span>
           )}
+        </div>
+        <div className="text-[10px] text-slate-500 dark:text-zinc-400 font-medium mb-2.5">
+          (Incl. of all taxes)
         </div>
 
         <AddToCartButton

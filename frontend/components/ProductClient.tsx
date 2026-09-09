@@ -17,6 +17,10 @@ type Product = {
   stock: number;
   brand?: string;
   category?: string;
+  countryOfOrigin?: string;
+  netQuantity?: string;
+  manufacturer?: string;
+  hsnCode?: string;
   soldCount?: number;
   createdAt?: string;
   variants?: Array<{
@@ -142,6 +146,10 @@ export default function ProductClient({ product, images }: Props) {
               </span>
             </>
           )}
+
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+            (Inclusive of all taxes)
+          </span>
         </div>
 
         {/* DYNAMIC CALCULATED TOTAL PRICE FOR MULTIPLE QUANTITIES */}
@@ -198,6 +206,39 @@ export default function ProductClient({ product, images }: Props) {
         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
           {product.description}
         </p>
+      </div>
+
+      {/* MANDATORY LEGAL METROLOGY DECLARATIONS (DYNAMIC FROM ADMIN) */}
+      <div className="pt-4 border-t border-slate-100 dark:border-zinc-800 space-y-3">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+          Product Details &amp; Statutory Disclosures
+        </h3>
+        <div className="grid grid-cols-2 gap-3 text-xs bg-slate-50 dark:bg-zinc-800/40 p-3.5 rounded-xl border border-slate-200/80 dark:border-zinc-800">
+          <div>
+            <span className="text-slate-400 block text-[11px]">Country of Origin</span>
+            <span className="font-semibold text-slate-800 dark:text-slate-200">
+              {product.countryOfOrigin || "India"}
+            </span>
+          </div>
+          <div>
+            <span className="text-slate-400 block text-[11px]">Net Quantity</span>
+            <span className="font-semibold text-slate-800 dark:text-slate-200">
+              {product.netQuantity || "1 Unit"}
+            </span>
+          </div>
+          <div>
+            <span className="text-slate-400 block text-[11px]">Manufacturer / Brand</span>
+            <span className="font-semibold text-slate-800 dark:text-slate-200">
+              {product.manufacturer || product.brand || "IONYX Gear"}
+            </span>
+          </div>
+          <div>
+            <span className="text-slate-400 block text-[11px]">Customer Support</span>
+            <span className="font-semibold text-slate-800 dark:text-slate-200">
+              support@ionyx.com
+            </span>
+          </div>
+        </div>
       </div>
 
     </div>

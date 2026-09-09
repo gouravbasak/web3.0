@@ -197,16 +197,19 @@ export default function OrderSuccessPage() {
     );
 
     /* ================= HEADER ================= */
-    pdf.setFontSize(20);
-    pdf.setTextColor(120, 30, 20);
-    pdf.text("INVOICE", pageWidth / 2, 18, { align: "center" });
+    pdf.setFontSize(16);
+    pdf.setTextColor(15, 23, 42);
+    pdf.text("TAX INVOICE / RETAIL INVOICE", pageWidth / 2, 14, { align: "center" });
 
-    // Invoice no + date in ONE line
-    // Invoice no + date - SPLIT INTO TWO LINES
-pdf.setFontSize(10);
-pdf.setTextColor(0, 0, 0);
-pdf.text(`Invoice No: ${order.orderId}`, pageWidth / 2, 24, { align: "center" });
-pdf.text(`Date: ${new Date(createdAt).toLocaleString()}`, pageWidth / 2, 30, { align: "center" });
+    pdf.setFontSize(8);
+    pdf.setTextColor(100, 116, 139);
+    pdf.text("Sold By: IONYX Technologies & Retail • West Bengal, India", pageWidth / 2, 19, { align: "center" });
+    pdf.text("Email: support@ionyx.com • Customer Helpline: +91 8637866948", pageWidth / 2, 23, { align: "center" });
+
+    pdf.setFontSize(9);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(`Invoice No: ${order.orderId}`, pageWidth / 2, 29, { align: "center" });
+    pdf.text(`Date: ${new Date(createdAt).toLocaleString()}`, pageWidth / 2, 34, { align: "center" });
     /* ================= PAYMENT INFO (TOP RIGHT) ================= */
     const paymentBoxX = pageWidth - 65;
     const paymentBoxY = 40;
@@ -341,9 +344,10 @@ if (addressLine) {
     pdf.text(`Rs. ${total}`, totalsXValue, y, { align: "right" });
 
     /* ================= TERMS ================= */
-    pdf.setFontSize(9);
+    pdf.setFontSize(8);
+    pdf.setTextColor(100, 116, 139);
     pdf.text(
-      "TERMS & CONDITIONS: All sales are final. Goods once shipped will not be cancelled. Returns are accepted only for defective or damaged items.",
+      "TERMS: All prices are inclusive of GST. Returns or replacements for defective/damaged merchandise are handled within 7 days of delivery as per Indian Consumer Protection (E-Commerce) Rules, 2020.",
       pageWidth / 2,
       255,
       { align: "center", maxWidth: pageWidth - 30 },

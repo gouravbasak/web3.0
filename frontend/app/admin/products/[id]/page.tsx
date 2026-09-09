@@ -101,6 +101,10 @@ export default function EditProductPage({ params }: any) {
           brand: data.brand,
           category: data.category,
           stock: data.stock,
+          countryOfOrigin: data.countryOfOrigin || "India",
+          netQuantity: data.netQuantity || "1 Unit",
+          manufacturer: data.manufacturer || "",
+          hsnCode: data.hsnCode || "",
           status: data.status || "available",
           isFeatured: Boolean(data.isFeatured),
         });
@@ -312,6 +316,67 @@ export default function EditProductPage({ params }: any) {
                   placeholder="e.g. Electronics > Headphones"
                   className="h-8"
                 />
+              </Card>
+
+              {/* Mandatory Indian Disclosures (Legal Metrology) */}
+              <Card className="p-4 border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/30 dark:bg-emerald-950/10">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">
+                    Mandatory Indian Disclosures (Legal Metrology)
+                  </p>
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded">
+                    India Rule Compliant
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Required by Indian Consumer Protection &amp; Legal Metrology Rules for online sale.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                  <div>
+                    <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                      Country of Origin *
+                    </label>
+                    <Input
+                      value={form.countryOfOrigin || "India"}
+                      onChange={(e) => update("countryOfOrigin", e.target.value)}
+                      placeholder="e.g. India"
+                      className="h-8 mt-1"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                      Net Quantity *
+                    </label>
+                    <Input
+                      value={form.netQuantity || "1 Unit"}
+                      onChange={(e) => update("netQuantity", e.target.value)}
+                      placeholder="e.g. 1 Unit, 1 Piece"
+                      className="h-8 mt-1"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                      Manufacturer / Packer
+                    </label>
+                    <Input
+                      value={form.manufacturer || ""}
+                      onChange={(e) => update("manufacturer", e.target.value)}
+                      placeholder="e.g. IONYX Tech, Bangalore"
+                      className="h-8 mt-1"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                      HSN Code (GST)
+                    </label>
+                    <Input
+                      value={form.hsnCode || ""}
+                      onChange={(e) => update("hsnCode", e.target.value)}
+                      placeholder="e.g. 8471"
+                      className="h-8 mt-1"
+                    />
+                  </div>
+                </div>
               </Card>
 
               {/* Price Section - Compact Grid with Actual Cost */}
