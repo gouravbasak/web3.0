@@ -128,7 +128,6 @@ export default function ProductClient({ product, images }: Props) {
         </span>
       </div>
 
-// ... inside render:
       {/* PRICE DISPLAY HERO - SINGLE UNIFIED PRICE + DYNAMIC TOTAL CALCULATION */}
       <div className="p-5 rounded-2xl bg-slate-50 dark:bg-zinc-800/40 border border-slate-200/80 dark:border-zinc-800 flex flex-col gap-2">
         <div className="flex items-baseline flex-wrap gap-3">
