@@ -43,7 +43,7 @@ export default function SignupPage() {
         credentials: "include",
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, acceptedTerms: true, termsVersion: "v1.0" }),
       });
 
       const data = await res.json().catch(() => ({}));
@@ -82,8 +82,8 @@ export default function SignupPage() {
         </div>
         <div className="p-6 overflow-y-auto max-h-[60vh] space-y-4 text-gray-600 dark:text-gray-400 text-sm">
           <div>
-            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">1. Acceptance of Terms</h3>
-            <p>By creating an account and using IONYX services, you agree to be bound by these Terms of Service. If you do not agree, please do not use our services.</p>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">1. Acceptance of Terms &amp; Age Eligibility (18+)</h3>
+            <p>By creating an account and using IONYX services, you represent and warrant under the Indian Contract Act 1872 that you are at least 18 years old and agree to be bound by these Terms of Service. If you do not agree, please do not use our services.</p>
           </div>
           
           <div>
@@ -127,8 +127,8 @@ export default function SignupPage() {
           </div>
           
           <div>
-            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">10. Contact Information</h3>
-            <p>For any questions regarding these terms, please contact us at support@ionyx.com or call +91 8637866948.</p>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">10. Contact &amp; Grievance Redressal</h3>
+            <p>For any questions or grievances regarding these terms, please contact our Grievance Officer at support@ionyx.com or call +91 8637866948 (Mon–Sat, 10 AM – 6 PM).</p>
           </div>
         </div>
         <div className="p-6 border-t border-gray-200 dark:border-gray-800">
@@ -193,18 +193,18 @@ export default function SignupPage() {
           </div>
           
           <div>
-            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">8. Children's Privacy</h3>
-            <p>Our services are not intended for children under 13. We do not knowingly collect information from children.</p>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">8. Age Requirement &amp; Minors (DPDP Act)</h3>
+            <p>Our services are intended for individuals who are 18 years of age or older in compliance with Section 9 of the DPDP Act 2023. We do not knowingly collect personal data from minors.</p>
           </div>
           
           <div>
             <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">9. Changes to Privacy Policy</h3>
-            <p>We may update this policy periodically. We will notify you of any material changes via email or website notice.</p>
+            <p>We may update this policy periodically to maintain compliance with Indian data protection laws. Changes will be posted on this page.</p>
           </div>
           
           <div>
-            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">10. Contact Us</h3>
-            <p>For privacy-related questions, email privacy@ionyx.com or call +91 8637866948.</p>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">10. Grievance Officer Details</h3>
+            <p>In accordance with IT Rules 2021, contact our Nodal Grievance Officer at support@ionyx.com or +91 8637866948. Complaints are acknowledged within 48 hours and resolved within 15–30 days.</p>
           </div>
         </div>
         <div className="p-6 border-t border-gray-200 dark:border-gray-800">
@@ -270,6 +270,16 @@ export default function SignupPage() {
             </div>
 
             <GoogleSignInButton />
+            <p className="text-center text-[11px] text-gray-500 dark:text-gray-400 mt-2 px-2">
+              By continuing with Google, you confirm you are 18+ and agree to our{" "}
+              <Link href="/terms" className="text-blue-600 dark:text-blue-400 hover:underline">
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy" className="text-blue-600 dark:text-blue-400 hover:underline">
+                Privacy Policy
+              </Link>.
+            </p>
 
             <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">
@@ -347,17 +357,17 @@ export default function SignupPage() {
 
               {/* Terms Checkbox with Modal Buttons */}
               <div className="space-y-2">
-                <div className="flex items-center gap-3">
+                <div className="flex items-start gap-3">
                   <input
                     type="checkbox"
                     id="terms"
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                     checked={agreeTerms}
                     onChange={(e) => setAgreeTerms(e.target.checked)}
                     required
                   />
-                  <label htmlFor="terms" className="text-xs text-gray-600 dark:text-gray-400">
-                    I agree to the{" "}
+                  <label htmlFor="terms" className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                    I confirm that I am at least 18 years old and agree to the{" "}
                     <button
                       type="button"
                       onClick={() => setShowTermsModal(true)}
@@ -373,6 +383,7 @@ export default function SignupPage() {
                     >
                       Privacy Policy
                     </button>
+                    .
                   </label>
                 </div>
               </div>

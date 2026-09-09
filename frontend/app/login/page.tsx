@@ -203,6 +203,12 @@ export default function LoginPage() {
 
               {/* GOOGLE SIGN IN BUTTON */}
               <GoogleSignInButton />
+              <p className="text-center text-[11px] text-slate-500 dark:text-slate-400 mt-2">
+                By continuing with Google, you confirm you are 18+ and agree to our{" "}
+                <Link href="/terms" className="text-emerald-600 dark:text-emerald-400 hover:underline">Terms</Link>
+                {" "}and{" "}
+                <Link href="/privacy" className="text-emerald-600 dark:text-emerald-400 hover:underline">Privacy Policy</Link>.
+              </p>
 
               <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">

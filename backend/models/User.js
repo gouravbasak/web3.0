@@ -18,11 +18,23 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-     phone: {             
-    type: String,
-    default: "",
+    phone: {             
+      type: String,
+      default: "",
       required: false,  
-  },
+    },
+    acceptedTerms: {
+      type: Boolean,
+      default: true,
+    },
+    acceptedTermsAt: {
+      type: Date,
+      default: Date.now,
+    },
+    termsVersion: {
+      type: String,
+      default: "v1.0",
+    },
      
   vouchers: [{
     code: String,

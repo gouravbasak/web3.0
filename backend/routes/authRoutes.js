@@ -63,7 +63,10 @@ router.post('/signup', authLimiter, async (req, res) => {
       name,
       email: email.toLowerCase(),
       passwordHash,
-       phone: "", // Initialize phone as empty string
+      phone: "", // Initialize phone as empty string
+      acceptedTerms: true,
+      acceptedTermsAt: new Date(),
+      termsVersion: "v1.0",
       vouchers: [] // Initialize empty vouchers array
     });
 
@@ -278,6 +281,9 @@ router.post('/google-login', async (req, res) => {
         passwordHash,
         profileImage: picture || '',
         phone: '',
+        acceptedTerms: true,
+        acceptedTermsAt: new Date(),
+        termsVersion: 'v1.0',
         vouchers: [],
       });
       console.log(`✅ New user created via Google Sign-In: ${cleanEmail}`);
