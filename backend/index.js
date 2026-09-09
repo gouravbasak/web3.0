@@ -22,6 +22,7 @@ const adminStatsRoutes = require("./routes/adminStatsRoutes");
 const productRoutes = require("./routes/productRoutes"); // public + search
 const paymentRoutes = require("./routes/paymentRoutes"); // Razorpay
 const reviewRoutes = require('./routes/reviewRoutes');//reviews
+const couponRoutes = require("./routes/couponRoutes"); // coupons
 /* ================= MIDDLEWARE ================= */
 const authMiddleware = require("./middlewares/auth");
 
@@ -72,6 +73,9 @@ app.use("/api/admin/stats", adminStatsRoutes);
 
 // Razorpay payments
 app.use("/api/payments", paymentRoutes);
+
+// Coupons & Promo Codes
+app.use("/api/coupons", couponRoutes);
 
 /* ================= USER PROFILE ================= */
 app.get("/api/me", authMiddleware, async (req, res) => {

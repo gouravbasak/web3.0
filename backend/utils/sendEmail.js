@@ -174,6 +174,203 @@ async function sendLoginOtpEmail({ to, name, otp }) {
   });
 }
 
+/* ================= LOW STOCK ALERT (ADMIN) ================= */
+
+async function sendLowStockAlertEmail({
+  to = "gouravbasak248@gmail.com",
+  productTitle,
+  productId,
+  remainingStock,
+}) {
+  const adminEmail = to || process.env.ADMIN_ALERT_EMAIL || "gouravbasak248@gmail.com";
+  const frontendUrl = process.env.FRONTEND_URL || "https://shopit-lilac-rho.vercel.app";
+
+  const isOut = remainingStock <= 0;
+  const badgeColor = isOut ? "#ef4444" : "#f59e0b";
+  const badgeText = isOut ? "● OUT OF STOCK URGENT" : `● LOW STOCK WARNING (${remainingStock} LEFT)`;
+
+  const html = baseTemplate({
+    title: isOut ? "Critical: Product Out of Stock!" : "Urgent: Low Inventory Alert!",
+    badge: badgeText,
+    content: `
+      <p>Hello <strong style="color:#ffffff;">Store Administrator</strong>,</p>
+
+      <p>An order was just placed that reduced the inventory of <strong style="color:#38bdf8;">${productTitle || "a product"}</strong> to a critical level:</p>
+
+      <!-- PRODUCT ALERT CARD -->
+      <div class="info-box" style="border-left: 4px solid ${badgeColor};">
+        <table width="100%" cellpadding="0" cellspacing="0" style="font-size:14px; margin-bottom:12px;">
+          <tr>
+            <td style="color:#94a3b8; padding:6px 0;">Product:</td>
+            <td align="right" style="color:#ffffff; font-weight:800; padding:6px 0;">${productTitle}</td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8; padding:6px 0;">Product ID:</td>
+            <td align="right" style="color:#94a3b8; font-family:monospace; padding:6px 0;">${productId}</td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8; padding:6px 0;">Remaining Stock:</td>
+            <td align="right" style="color:${badgeColor}; font-weight:900; font-size:18px; padding:6px 0;">
+              ${remainingStock} units
+            </td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8; padding:6px 0;">Status:</td>
+            <td align="right" style="color:${badgeColor}; font-weight:800; padding:6px 0;">
+              ${isOut ? "CRITICAL (0 UNITS)" : "CRITICALLY LOW (< 3 UNITS)"}
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div style="margin:28px 0; text-align:center;">
+        <a href="${frontendUrl}/admin/inventory" class="btn-primary" style="background:${badgeColor};">
+          Restock Inventory in Admin Panel →
+        </a>
+      </div>
+
+      <p style="font-size:12px; color:#94a3b8; text-align:center;">
+        This is an automated inventory guard email sent directly to your administrative mailbox.
+      </p>
+    `,
+  });
+
+  await getTransporter().sendMail({
+    from: `"IONYX Inventory Guard" <${process.env.EMAIL_USER}>`,
+    to: adminEmail,
+    subject: `🚨 ${isOut ? "OUT OF STOCK" : "LOW STOCK ALERT"}: ${productTitle} (${remainingStock} left)`,
+    html,
+  });
+}
+
+/* ================= ORDER STATUS UPDATE ================= */
+
+async function sendOrderStatusUpdateEmail({
+  to,
+  name,
+  orderId,
+  status,
+  courierName,
+  trackingNumber,
+  trackingUrl,
+  total,
+}) {
+  const frontendUrl = process.env.FRONTEND_URL || "https://shopit-lilac-rho.vercel.app";
+  const trackLink = `${frontendUrl}/track-order?id=${orderId}`;
+
+  let title = `Order Status: ${status}`;
+  let badge = `● STATUS: ${status.toUpperCase()}`;
+  let subject = `Shipment Update • #${orderId} is ${status}`;
+  let messageContent = "";
+
+  if (status === "Processing") {
+    title = "Order Confirmed & Processing!";
+    badge = "● SHIPMENT IN PREPARATION";
+    subject = `Order Confirmed • #${orderId} is Being Prepared`;
+    messageContent = `
+      <p>Great news! Your payment is confirmed and our warehouse team is packing your gear with protective express packaging.</p>
+    `;
+  } else if (status === "Shipped") {
+    title = "Your Order Has Been Dispatched! 🚀";
+    badge = "● DISPATCHED VIA EXPRESS COURIER";
+    subject = `Order Dispatched • #${orderId} is on the way!`;
+    messageContent = `
+      <p>Exciting news! Your package has been handed over to our courier partner and is officially on its way to you.</p>
+
+      ${courierName || trackingNumber ? `
+        <div class="info-box" style="margin:16px 0;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;">
+            ${courierName ? `
+              <tr>
+                <td style="color:#94a3b8; padding:4px 0;">Courier Partner:</td>
+                <td align="right" style="color:#ffffff; font-weight:700; padding:4px 0;">${courierName}</td>
+              </tr>
+            ` : ""}
+            ${trackingNumber ? `
+              <tr>
+                <td style="color:#94a3b8; padding:4px 0;">Tracking Number (AWB):</td>
+                <td align="right" style="color:#38bdf8; font-weight:800; font-family:monospace; padding:4px 0;">${trackingNumber}</td>
+              </tr>
+            ` : ""}
+          </table>
+        </div>
+      ` : ""}
+
+      ${trackingUrl ? `
+        <div style="margin:16px 0; text-align:center;">
+          <a href="${trackingUrl}" target="_blank" style="color:#38bdf8; font-size:13px; font-weight:700; text-decoration:underline;">
+            Open Courier Tracking Portal →
+          </a>
+        </div>
+      ` : ""}
+    `;
+  } else if (status === "Out for Delivery") {
+    title = "Out for Delivery Today! 📦";
+    badge = "● ARRIVING TODAY";
+    subject = `Arriving Today • #${orderId} is Out for Delivery`;
+    messageContent = `
+      <p>Your order is in your local delivery van and will be delivered to your doorstep today. Please keep your phone reachable for the courier executive.</p>
+    `;
+  } else if (status === "Delivered") {
+    title = "Your Package Has Been Delivered! 🎉";
+    badge = "● DELIVERED SAFELY";
+    subject = `Delivered Successfully • #${orderId}`;
+    messageContent = `
+      <p>Your package has been safely delivered! We hope you love your new gear.</p>
+      <p>If you need any support, warranty assistance, or return/exchange within 7 days, our team is always here to assist.</p>
+    `;
+  } else {
+    messageContent = `<p>The status of your order <strong>#${orderId}</strong> has been updated to: <strong style="color:#38bdf8;">${status}</strong>.</p>`;
+  }
+
+  const html = baseTemplate({
+    title,
+    badge,
+    content: `
+      <p>Hi <strong style="color:#ffffff;">${name || "Valued Customer"}</strong>,</p>
+
+      ${messageContent}
+
+      <!-- ORDER SUMMARY CARD -->
+      <div class="info-box">
+        <table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;">
+          <tr>
+            <td style="color:#94a3b8; padding:4px 0;">Order Number:</td>
+            <td align="right" style="color:#38bdf8; font-weight:800; padding:4px 0;">#${orderId}</td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8; padding:4px 0;">Current Status:</td>
+            <td align="right" style="color:#34d399; font-weight:800; padding:4px 0;">● ${status}</td>
+          </tr>
+          ${total ? `
+            <tr>
+              <td style="color:#94a3b8; padding:4px 0;">Order Total:</td>
+              <td align="right" style="color:#ffffff; font-weight:700; padding:4px 0;">₹${Number(total).toLocaleString("en-IN")}</td>
+            </tr>
+          ` : ""}
+        </table>
+      </div>
+
+      <div style="margin:28px 0; text-align:center;">
+        <a href="${trackLink}" class="btn-primary">
+          Track Your Shipment Live →
+        </a>
+      </div>
+
+      <p style="font-size:12px; color:#94a3b8; text-align:center;">
+        You can track the live milestones of your package at any time on our website.
+      </p>
+    `,
+  });
+
+  await getTransporter().sendMail({
+    from: `"IONYX Store" <${process.env.EMAIL_USER}>`,
+    to,
+    subject,
+    html,
+  });
+}
+
 /* ================= EXPORTS ================= */
 
 module.exports = {
@@ -181,5 +378,7 @@ module.exports = {
   sendOrderCancelledEmail,
   sendAdminOtpEmail,
   sendLoginOtpEmail,
+  sendLowStockAlertEmail,
+  sendOrderStatusUpdateEmail,
 };
 

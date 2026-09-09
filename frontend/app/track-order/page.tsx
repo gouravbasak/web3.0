@@ -51,6 +51,9 @@ type TrackedOrder = {
     pincode?: string;
     paymentMethod?: string;
   };
+  courierName?: string;
+  trackingNumber?: string;
+  trackingUrl?: string;
 };
 
 function TrackOrderContent() {
@@ -211,6 +214,42 @@ function TrackOrderContent() {
             <div className="py-2">
               <OrderProgressBar currentStatus={order.status} statusHistory={order.statusHistory} />
             </div>
+
+            {/* COURIER & LIVE SHIPMENT AWB BANNER */}
+            {(order.courierName || order.trackingNumber) && (
+              <div className="p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-800/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                    <Truck className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2 flex-wrap">
+                      <span>Shipped via {order.courierName || "Express Courier"}</span>
+                      {order.trackingNumber && (
+                        <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300">
+                          AWB #{order.trackingNumber}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">
+                      Your parcel has been assigned to our logistics partner for expedited delivery.
+                    </div>
+                  </div>
+                </div>
+
+                {order.trackingUrl && (
+                  <a
+                    href={order.trackingUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5 shrink-0"
+                  >
+                    <span>Track on Courier Site</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </a>
+                )}
+              </div>
+            )}
 
             {/* DELIVERY DETAILS GRID */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-zinc-800/40 border border-slate-200/60 dark:border-zinc-800 text-xs">

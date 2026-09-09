@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ShieldCheck, Loader2 } from "lucide-react";
+import { ShieldCheck, Loader2, Tag } from "lucide-react";
 import { getApiBaseUrl } from "@/lib/apiBase";
 
 const API = getApiBaseUrl();
@@ -134,6 +134,11 @@ export default function AdminLayout({
           <Link href="/admin/inventory" className={linkClass("/admin/inventory")}>
             <img src="/inventory.png" alt="" className="w-4 h-4 invert dark:invert-0" />
             Inventory
+          </Link>
+
+          <Link href="/admin/coupons" className={linkClass("/admin/coupons")}>
+            <Tag className="w-4 h-4 text-amber-400" />
+            Coupons & Promos
           </Link>
         </nav>
 

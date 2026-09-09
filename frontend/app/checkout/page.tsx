@@ -31,7 +31,8 @@ import {
   Wallet,
   IndianRupee,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Tag,
 } from "lucide-react";
 
 declare global {
@@ -48,10 +49,20 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { cart, clearCart } = useCart();
   
-  /* ================= VOUCHER STATE ================= */
+  /* ================= VOUCHER & PROMO STATE ================= */
   const [availableVoucher, setAvailableVoucher] = useState<any>(null);
   const [appliedVoucher, setAppliedVoucher] = useState<any>(null);
   const [loadingVoucher, setLoadingVoucher] = useState(false);
+
+  const [promoCodeInput, setPromoCodeInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    description?: string;
+    discountType: "percentage" | "flat";
+    discountValue: number;
+    discountAmount: number;
+  } | null>(null);
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
 
   /* ================= ADDRESS STATE ================= */
   const [showAddressModal, setShowAddressModal] = useState(false);
@@ -159,16 +170,58 @@ export default function CheckoutPage() {
   // Voucher discount (₹1000)
   const voucherDiscount = appliedVoucher ? 1000 : 0;
   
-  // Calculate final totals based on payment method and voucher
-  const totalAfterVoucher = Math.max(0, totalBeforeVoucher - voucherDiscount);
+  // Promo code / coupon discount
+  const couponDiscount = appliedCoupon ? appliedCoupon.discountAmount : 0;
+  const totalDiscounts = voucherDiscount + couponDiscount;
+
+  // Calculate final totals based on payment method, voucher, and promo coupon
+  const totalAfterDiscounts = Math.max(0, totalBeforeVoucher - totalDiscounts);
   const rawDiscountedTotal = paymentMethod === "online" 
-    ? totalAfterVoucher - (totalAfterVoucher * 0.05) 
-    : totalAfterVoucher;
+    ? totalAfterDiscounts - (totalAfterDiscounts * 0.05) 
+    : totalAfterDiscounts;
   const discountedTotal = Math.max(0, rawDiscountedTotal);
   
   // Amount for free shipping
   const amountForFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
   const progressToFreeShipping = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
+
+  /* ================= APPLY / REMOVE COUPON ================= */
+  const handleApplyCoupon = async () => {
+    if (!promoCodeInput.trim()) {
+      toast.error("Please enter a promo code");
+      return;
+    }
+
+    setValidatingCoupon(true);
+    try {
+      const res = await fetch(`${API}/api/coupons/validate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: promoCodeInput.trim(),
+          cartSubtotal: subtotal,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.valid && data.coupon) {
+        setAppliedCoupon(data.coupon);
+        toast.success(data.message || `Coupon "${data.coupon.code}" applied!`, { icon: "🎟️" });
+      } else {
+        toast.error(data.message || "Invalid promo code");
+      }
+    } catch (err) {
+      toast.error("Error validating promo code");
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setPromoCodeInput("");
+    toast("Promo code removed", { icon: "🗑️" });
+  };
 
   // Estimated delivery date range (7-10 days from now)
   const deliveryDateRange = useMemo(() => {
@@ -210,6 +263,8 @@ export default function CheckoutPage() {
       code: appliedVoucher.code,
       amount: voucherDiscount
     } : null,
+    couponCode: appliedCoupon ? appliedCoupon.code : "",
+    couponDiscount,
     total: discountedTotal,
     billing,
     payment: paymentDetails,
@@ -645,6 +700,66 @@ export default function CheckoutPage() {
 
             <Separator className="my-4" />
 
+            {/* Promo Code Input */}
+            <div className="mb-4">
+              <label className="text-xs font-semibold text-muted-foreground block mb-1.5">
+                Have a Promo Code?
+              </label>
+              {appliedCoupon ? (
+                <div className="flex items-center justify-between p-2.5 bg-emerald-50 dark:bg-emerald-950/25 border border-emerald-300 dark:border-emerald-800 rounded-lg text-xs">
+                  <div className="flex items-center gap-2">
+                    <Tag className="h-4 w-4 text-emerald-600" />
+                    <div>
+                      <span className="font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wide">
+                        {appliedCoupon.code}
+                      </span>
+                      <p className="text-[11px] text-emerald-600 dark:text-emerald-400">
+                        ₹{appliedCoupon.discountAmount} discount applied
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleRemoveCoupon}
+                    className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"
+                  >
+                    <X className="h-3.5 w-3.5 mr-1" />
+                    Remove
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Input
+                      placeholder="e.g. DIWALI10, FLAT50"
+                      value={promoCodeInput}
+                      onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
+                      className="h-9 uppercase tracking-wider text-xs font-semibold pl-8"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleApplyCoupon();
+                        }
+                      }}
+                    />
+                    <Tag className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleApplyCoupon}
+                    disabled={validatingCoupon || !promoCodeInput.trim()}
+                    className="h-9 px-3 text-xs font-semibold border-purple-300 dark:border-purple-800 hover:bg-purple-50 dark:hover:bg-purple-950/40"
+                  >
+                    {validatingCoupon ? "Checking..." : "Apply"}
+                  </Button>
+                </div>
+              )}
+            </div>
+
             {/* Price Breakdown */}
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
@@ -667,11 +782,22 @@ export default function CheckoutPage() {
                   <span>-₹{voucherDiscount.toFixed(2)}</span>
                 </div>
               )}
+
+              {/* Promo Coupon Discount */}
+              {appliedCoupon && (
+                <div className="flex justify-between text-sm text-emerald-600 font-medium">
+                  <span className="flex items-center gap-1">
+                    <Tag className="w-3.5 h-3.5" />
+                    Promo ({appliedCoupon.code})
+                  </span>
+                  <span>-₹{couponDiscount.toFixed(2)}</span>
+                </div>
+              )}
               
               {paymentMethod === "online" && (
                 <div className="flex justify-between text-sm text-purple-600">
                   <span>Prepaid discount (5%)</span>
-                  <span>-₹{(totalAfterVoucher * 0.05).toFixed(2)}</span>
+                  <span>-₹{prepaidDiscount.toFixed(2)}</span>
                 </div>
               )}
             </div>

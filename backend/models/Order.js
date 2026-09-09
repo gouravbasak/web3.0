@@ -81,9 +81,18 @@ const OrderSchema = new mongoose.Schema(
     default: false
   },
   
-  deliveredAt: {
-    type: Date
-  }
+      deliveredAt: {
+        type: Date
+      },
+
+      // 🚚 Shipping & Tracking Details
+      courierName: { type: String, default: "" },
+      trackingNumber: { type: String, default: "" },
+      trackingUrl: { type: String, default: "" },
+
+      // 🎟️ Applied Coupon / Promo Code
+      couponCode: { type: String, default: "" },
+      couponDiscount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

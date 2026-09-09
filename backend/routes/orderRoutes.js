@@ -4,12 +4,19 @@ const router = express.Router();
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 const userAuth = require("../middlewares/userAuth");
-const { sendOrderCreatedEmail } = require("../utils/sendEmail");
+const {
+  sendOrderCreatedEmail,
+  sendOrderCancelledEmail,
+  sendLowStockAlertEmail,
+  sendOrderStatusUpdateEmail,
+} = require("../utils/sendEmail");
+
 /**
  * Helper: try to decrement stock for items one-by-one using a conditional atomic update.
  */
 async function decrementStock(items) {
   const updated = [];
+  const lowStockAlerts = [];
   try {
     for (const it of items) {
       const prod = await Product.findOneAndUpdate(
@@ -29,9 +36,18 @@ async function decrementStock(items) {
       }
 
       updated.push({ id: it.productId, qty: it.qty });
+
+      // Check if product stock dropped below 3 units after this order
+      if (typeof prod.stock === "number" && prod.stock < 3) {
+        lowStockAlerts.push({
+          id: prod._id.toString(),
+          title: prod.title,
+          remainingStock: prod.stock,
+        });
+      }
     }
 
-    return { ok: true, updated };
+    return { ok: true, updated, lowStockAlerts };
   } catch (err) {
     for (const u of updated) {
       try {
@@ -83,13 +99,26 @@ router.post("/", userAuth, async (req, res) => {
       
     });
     // 2️⃣.5️⃣ Increment soldCount for products
-for (const item of items) {
-  await Product.findByIdAndUpdate(item.productId, {
-    $inc: { soldCount: item.qty },
-  });
-}
+    for (const item of items) {
+      await Product.findByIdAndUpdate(item.productId, {
+        $inc: { soldCount: item.qty },
+      });
+    }
 
-    // 3️⃣ Send email (NON-BLOCKING)
+    // 2️⃣.6️⃣ If coupon was used, increment coupon usage count
+    if (payload.couponCode) {
+      try {
+        const Coupon = require("../models/Coupon");
+        await Coupon.findOneAndUpdate(
+          { code: payload.couponCode.trim().toUpperCase() },
+          { $inc: { usedCount: 1 } }
+        );
+      } catch (couponErr) {
+        console.error("Coupon usage update failed:", couponErr);
+      }
+    }
+
+    // 3️⃣ Send confirmation email (NON-BLOCKING)
     try {
       await sendOrderCreatedEmail({
         to: payload.billing.email,
@@ -101,6 +130,22 @@ for (const item of items) {
     } catch (emailErr) {
       console.error("Email failed:", emailErr);
       // ❌ do NOT fail order if email fails
+    }
+
+    // 4️⃣ Send Automated Low-Inventory Alerts to Admin if stock < 3
+    if (dec.lowStockAlerts && dec.lowStockAlerts.length > 0) {
+      for (const alert of dec.lowStockAlerts) {
+        try {
+          await sendLowStockAlertEmail({
+            to: "gouravbasak248@gmail.com",
+            productTitle: alert.title,
+            productId: alert.id,
+            remainingStock: alert.remainingStock,
+          });
+        } catch (alertErr) {
+          console.error("Low stock alert email failed:", alertErr);
+        }
+      }
     }
 
     res.json({ success: true, order });
@@ -166,6 +211,9 @@ router.get("/track/:orderId", async (req, res) => {
           pincode: order.billing?.pincode || "",
           paymentMethod: order.billing?.paymentMethod || "Prepaid",
         },
+        courierName: order.courierName || "",
+        trackingNumber: order.trackingNumber || "",
+        trackingUrl: order.trackingUrl || "",
       },
     });
   } catch (err) {
@@ -273,13 +321,11 @@ router.get("/:id", async (req, res) => {
 });
 
 /* =====================================================
-   ADMIN: UPDATE ORDER STATUS
+   ADMIN: UPDATE ORDER STATUS & SHIPMENT DETAILS
 ===================================================== */
-const { sendOrderCancelledEmail } = require("../utils/sendEmail");
-
 router.put("/:id/status", async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, courierName, trackingNumber, trackingUrl, note } = req.body;
 
     const order = await Order.findById(req.params.id);
     if (!order) {
@@ -288,31 +334,51 @@ router.put("/:id/status", async (req, res) => {
 
     const previousStatus = order.status;
 
-    order.status = status;
-     if (status === "Delivered" && previousStatus !== "Delivered") {
+    if (status) {
+      order.status = status;
+    }
+
+    if (courierName !== undefined) order.courierName = courierName;
+    if (trackingNumber !== undefined) order.trackingNumber = trackingNumber;
+    if (trackingUrl !== undefined) order.trackingUrl = trackingUrl;
+
+    if (status === "Delivered" && previousStatus !== "Delivered") {
       order.deliveredAt = new Date();
     }
 
     order.statusHistory.push({
-      status,
+      status: status || previousStatus,
       at: new Date(),
-      note: "",
+      note: note || (courierName ? `Courier: ${courierName}${trackingNumber ? `, AWB: ${trackingNumber}` : ""}` : ""),
       by: "admin",
     });
 
     await order.save();
 
-    // 🔔 SEND EMAIL ONLY WHEN CANCELLED
-    if (status === "Cancelled" && previousStatus !== "Cancelled") {
+    // 🔔 SEND AUTOMATED EMAIL NOTIFICATION ON STATUS CHANGE (NON-BLOCKING)
+    if (status && status !== previousStatus && order.billing?.email) {
       try {
-        await sendOrderCancelledEmail({
-          to: order.billing.email,
-          name: order.billing.name,
-          orderId: order.orderId,
-          total: order.total,
-        });
+        if (status === "Cancelled") {
+          await sendOrderCancelledEmail({
+            to: order.billing.email,
+            name: order.billing.fullName || order.billing.name,
+            orderId: order.orderId,
+            total: order.payableAmount || order.total,
+          });
+        } else {
+          await sendOrderStatusUpdateEmail({
+            to: order.billing.email,
+            name: order.billing.fullName || order.billing.name,
+            orderId: order.orderId,
+            status,
+            courierName: order.courierName,
+            trackingNumber: order.trackingNumber,
+            trackingUrl: order.trackingUrl,
+            total: order.payableAmount || order.total,
+          });
+        }
       } catch (emailErr) {
-        console.error("Cancel email failed:", emailErr);
+        console.error("Order status email failed:", emailErr);
       }
     }
 
@@ -322,6 +388,5 @@ router.put("/:id/status", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
 
 module.exports = router;

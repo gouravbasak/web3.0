@@ -38,6 +38,9 @@ export default function OrderViewClient({ order }: { order: any }) {
   const initialStatus = (order.status as string) || "Pending";
 
   const [status, setStatus] = useState(initialStatus);
+  const [courierName, setCourierName] = useState(order.courierName || "");
+  const [trackingNumber, setTrackingNumber] = useState(order.trackingNumber || "");
+  const [trackingUrl, setTrackingUrl] = useState(order.trackingUrl || "");
   const [saving, setSaving] = useState(false);
 
   const updateStatus = async (nextStatus?: string) => {
@@ -57,7 +60,12 @@ export default function OrderViewClient({ order }: { order: any }) {
           method: "PUT",
           headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
           credentials: "include", // required for admin cookie auth
-          body: JSON.stringify({ status: finalStatus }),
+          body: JSON.stringify({
+            status: finalStatus,
+            courierName: courierName.trim(),
+            trackingNumber: trackingNumber.trim(),
+            trackingUrl: trackingUrl.trim(),
+          }),
         },
       );
 
@@ -191,27 +199,105 @@ return (
       </div>
     </div>
 
-    {/* ===== STATUS ACTION BAR ===== */}
-    <div className="flex items-center justify-end gap-3 pt-2">
-      <select
-        value={status}
-        onChange={(e) => setStatus(e.target.value)}
-        className="border rounded-md px-3 py-2 text-sm bg-background"
-      >
-        <option>Pending</option>
-        <option>Processing</option>
-        <option>Shipped</option>
-        <option>Delivered</option>
-        <option>Cancelled</option>
-      </select>
+    {/* ===== SHIPMENT & COURIER TRACKING DETAILS ===== */}
+    <div className="rounded-xl border bg-card p-5 space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-sm font-semibold">Shipment & Courier Tracking</div>
+          <div className="text-xs text-muted-foreground">
+            Customer receives automated live tracking updates by email upon status change.
+          </div>
+        </div>
+        {order.trackingNumber && (
+          <span className="text-xs font-mono px-2 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 rounded border border-emerald-200 dark:border-emerald-800">
+            AWB: {order.trackingNumber}
+          </span>
+        )}
+      </div>
 
-      <button
-        onClick={() => updateStatus(status)}
-        disabled={saving}
-        className="px-5 py-2 rounded-md bg-blue-600 text-white font-medium disabled:opacity-60"
-      >
-        {saving ? "Saving…" : "Save"}
-      </button>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label className="text-xs font-medium text-muted-foreground block mb-1">
+            Courier Partner
+          </label>
+          <input
+            type="text"
+            placeholder="e.g. BlueDart, Delhivery, DTDC"
+            value={courierName}
+            onChange={(e) => setCourierName(e.target.value)}
+            className="w-full border rounded-md px-3 py-2 text-sm bg-background"
+          />
+          <div className="flex gap-1.5 mt-1.5 flex-wrap">
+            {["BlueDart", "Delhivery", "DTDC", "India Post"].map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setCourierName(c)}
+                className="text-[10px] px-2 py-0.5 rounded bg-muted hover:bg-muted/80 text-muted-foreground"
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="text-xs font-medium text-muted-foreground block mb-1">
+            Tracking / AWB Number
+          </label>
+          <input
+            type="text"
+            placeholder="e.g. BLU123456789"
+            value={trackingNumber}
+            onChange={(e) => setTrackingNumber(e.target.value)}
+            className="w-full border rounded-md px-3 py-2 text-sm font-mono bg-background"
+          />
+        </div>
+
+        <div>
+          <label className="text-xs font-medium text-muted-foreground block mb-1">
+            Courier Tracking URL (Optional)
+          </label>
+          <input
+            type="url"
+            placeholder="https://track.courier.com/..."
+            value={trackingUrl}
+            onChange={(e) => setTrackingUrl(e.target.value)}
+            className="w-full border rounded-md px-3 py-2 text-sm bg-background"
+          />
+        </div>
+      </div>
+    </div>
+
+    {/* ===== STATUS ACTION BAR ===== */}
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 bg-card p-4 rounded-xl border">
+      <div className="text-xs text-muted-foreground">
+        Current Status: <strong className="text-foreground">{status}</strong>
+        <span className="hidden sm:inline"> • Updates trigger customer email alerts</span>
+      </div>
+
+      <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="border rounded-md px-3 py-2 text-sm bg-background"
+        >
+          <option>Pending</option>
+          <option>Processing</option>
+          <option>Shipped</option>
+          <option>Out for Delivery</option>
+          <option>Delivered</option>
+          <option>Cancelled</option>
+        </select>
+
+        <button
+          onClick={() => updateStatus(status)}
+          disabled={saving}
+          className="px-6 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium disabled:opacity-60 transition"
+        >
+          {saving ? "Updating…" : "Update Status & Notify"}
+        </button>
+      </div>
     </div>
   </div>
 );
